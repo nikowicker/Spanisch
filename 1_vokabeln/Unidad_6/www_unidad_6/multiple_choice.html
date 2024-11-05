@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple-Choice Quiz: Spanisch Vokabeln</title>
+    <style>
+        /* Minimalistisches Design mit sanften Pastelltönen */
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f3f4f6;
+            text-align: center;
+        }
+
+        /* Header Styling */
+        header {
+            width: 90%;
+            background: linear-gradient(135deg, #82c8a0, #b3a4b9);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        /* Größere Abstände zwischen Abschnitten */
+        #settings {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        #questionContainer {
+            margin-top: 20px;
+        }
+
+        /* Fragebereich ohne Hintergrund */
+        #questionContainer {
+            width: 400px;
+            min-height: 150px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #2b2b2b;
+        }
+
+        #question {
+            font-size: 24px;
+            color: #2b2b2b;
+        }
+
+        /* Fortschrittsbalken abgestimmt auf Antwortoptionen */
+        #progress-bar {
+            width: 100%;
+            max-width: 400px;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+            align-self: center;
+            margin-bottom: 40px; /* Abstand zum "Zurück"-Button */
+        }
+
+        #progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #82c8a0, #5e9c76);
+            width: 0%;
+            border-radius: 30px;
+            transition: width 0.4s ease;
+        }
+
+        /* Antwort-Schaltflächen */
+        #choices {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+
+        .choiceButton {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 30px;
+            background-color: #a8d5ba;
+            color: white;
+            transition: background-color 0.3s;
+            width: 100%;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .choiceButton:hover {
+            background-color: #82c8a0;
+        }
+
+        /* Falsche und richtige Antwortanzeige */
+        .choiceButton.correct {
+            background-color: #5e9c76;
+        }
+        .choiceButton.incorrect {
+            background-color: #d1b3c4; /* Pastell-Lila für falsche Antwort */
+        }
+
+        /* Dropdown-Menü für Schwierigkeitsgrad ohne Label */
+        #difficulty-select {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 30px;
+            background-color: #a8d5ba;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        #difficulty-select:hover {
+            background-color: #82c8a0;
+        }
+
+        /* Zurück-Button */
+        #back-button {
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border: none;
+            border-radius: 30px;
+            background-color: #a8d5ba;
+            color: white;
+            transition: background-color 0.3s;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            left: 0;
+            transform: translateX(0);
+        }
+        #back-button:hover {
+            background-color: #82c8a0;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Multiple-Choice Quiz: Spanisch Vokabeln</h1>
+    </header>
+    <main>
+        <div id="settings">
+            <select id="difficulty-select">
+                <option value="easy">Einfach</option>
+                <option value="medium" selected>Mittel</option>
+                <option value="hard">Schwierig</option>
+            </select>
+        </div>
+        <div id="questionContainer">
+            <span id="question">Frage wird geladen...</span>
+            <div id="choices"></div>
+        </div>
+        <div id="progress-bar">
+            <div id="progress-fill"></div>
+        </div>
+    </main>
+    <!-- Zurück-Button -->
+    <button id="back-button" onclick="window.location.href='index.html';">zurück</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const questions = [
+   { question: "'der Klassenraum'?", choices: ["el aula", "la clase", "el salón", "la biblioteca"], correct: "el aula" },
+    { question: "'das Sekretariat'?", choices: ["la secretaría", "el gimnasio", "la oficina", "la biblioteca"], correct: "la secretaría" },
+    { question: "'Informatik'?", choices: ["la informática", "la literatura", "el recreo", "la clase"], correct: "la informática" },
+    { question: "'die Sporthalle'?", choices: ["el gimnasio", "el estadio", "la sala", "el parque"], correct: "el gimnasio" },
+    { question: "'der Rucksack'?", choices: ["la mochila", "la carpeta", "el estuche", "el portátil"], correct: "la mochila" },
+    { question: "'der Ordner'?", choices: ["la carpeta", "el cuaderno", "el libro", "la calculadora"], correct: "la carpeta" },
+    { question: "'der Kugelschreiber'?", choices: ["el bolígrafo", "el lápiz", "la goma", "la calculadora"], correct: "el bolígrafo" },
+    { question: "'das Radiergummi'?", choices: ["la goma", "el lápiz", "el cuaderno", "la carpeta"], correct: "la goma" },
+    { question: "'der Laptop'?", choices: ["el portátil", "el ordenador", "la computadora", "el cuaderno"], correct: "el portátil" },
+    { question: "'der Bleistift'?", choices: ["el lápiz", "el bolígrafo", "la goma", "la carpeta"], correct: "el lápiz" },
+    { question: "'das Heft'?", choices: ["el cuaderno", "el libro", "la carpeta", "el estuche"], correct: "el cuaderno" },
+    { question: "'das Mäppchen'?", choices: ["el estuche", "la mochila", "el cuaderno", "el bolígrafo"], correct: "el estuche" },
+    { question: "'der Taschenrechner'?", choices: ["la calculadora", "el ordenador", "el portátil", "el lápiz"], correct: "la calculadora" },
+    { question: "'wie viele'?", choices: ["cuántos", "quiénes", "dónde", "por qué"], correct: "cuántos" },
+    { question: "'Spanisch'?", choices: ["el castellano", "el francés", "el inglés", "el alemán"], correct: "el castellano" },
+    { question: "'Literatur'?", choices: ["la literatura", "la historia", "la biología", "la química"], correct: "la literatura" },
+    { question: "'die Pause'?", choices: ["el recreo", "la clase", "el descanso", "la hora"], correct: "el recreo" },
+    { question: "'schlecht aussehen'?", choices: ["tener mala cara", "estar cansado", "verse mal", "tener frío"], correct: "tener mala cara" },
+    { question: "'schlecht'?", choices: ["malo, -a", "bueno, -a", "bonito, -a", "fácil"], correct: "malo, -a" },
+    { question: "'das Gesicht'?", choices: ["la cara", "la cabeza", "la boca", "los ojos"], correct: "la cara" },
+    { question: "'suchen'?", choices: ["buscar", "mirar", "ver", "encontrar"], correct: "buscar" },
+    { question: "'finden'?", choices: ["encontrar", "buscar", "mirar", "ver"], correct: "encontrar" },
+    { question: "'jemand'?", choices: ["alguien", "algo", "nadie", "ninguno"], correct: "alguien" },
+    { question: "'anrufen'?", choices: ["llamar", "escuchar", "ver", "hablar"], correct: "llamar" },
+    { question: "'leise stellen'?", choices: ["poner en silencio", "hablar bajo", "escuchar bien", "cerrar"], correct: "poner en silencio" },
+    { question: "'die Ruhe'?", choices: ["el silencio", "la calma", "el descanso", "el ruido"], correct: "el silencio" },
+    { question: "'denken'?", choices: ["pensar", "creer", "mirar", "buscar"], correct: "pensar" },
+    { question: "'schauen'?", choices: ["mirar", "escuchar", "ver", "buscar"], correct: "mirar" },
+    { question: "'glauben'?", choices: ["creer", "pensar", "ver", "buscar"], correct: "creer" },
+    { question: "'dass'?", choices: ["que", "por", "para", "con"], correct: "que" },
+    { question: "'schlafen'?", choices: ["dormir", "relajarse", "despertarse", "vivir"], correct: "dormir" },
+    { question: "'sich ausruhen'?", choices: ["relajarse", "correr", "ver", "pensar"], correct: "relajarse" },
+    { question: "'trinken'?", choices: ["tomar", "comer", "vivir", "ver"], correct: "tomar" },
+    { question: "'weggehen'?", choices: ["irse", "venir", "entrar", "quedarse"], correct: "irse" },
+    { question: "'aufstehen'?", choices: ["levantarse", "acostarse", "sentarse", "quedarse"], correct: "levantarse" },
+    { question: "'die Milch'?", choices: ["la leche", "el agua", "el vino", "la cerveza"], correct: "la leche" },
+    { question: "'unser'?", choices: ["nuestro", "su", "mi", "vuestro"], correct: "nuestro" },
+    { question: "'verlieren'?", choices: ["perder", "ganar", "buscar", "encontrar"], correct: "perder" },
+    { question: "'bleiben'?", choices: ["quedarse", "irse", "levantarse", "salir"], correct: "quedarse" },
+    { question: "'sich waschen'?", choices: ["lavarse", "ducharse", "peinarse", "secarse"], correct: "lavarse" },
+    { question: "'sich duschen'?", choices: ["ducharse", "lavarse", "bañarse", "secarse"], correct: "ducharse" },
+    { question: "'das Wasser'?", choices: ["el agua", "la leche", "el vino", "el zumo"], correct: "el agua" },
+    { question: "'sich anziehen'?", choices: ["ponerse", "quitarse", "vestirse", "lavarse"], correct: "ponerse" },
+    { question: "'ausgehen'?", choices: ["salir", "entrar", "quedarse", "irse"], correct: "salir" },
+    { question: "'zufrieden sein'?", choices: ["estar contento", "estar triste", "estar cansado", "estar ocupado"], correct: "estar contento" },
+    { question: "'gut'?", choices: ["bueno", "malo", "fácil", "rápido"], correct: "bueno" },
+    { question: "'morgen'?", choices: ["mañana", "hoy", "ayer", "tarde"], correct: "mañana" },
+    { question: "'viel'?", choices: ["mucho", "poco", "nada", "algunos"], correct: "mucho" },
+    { question: "'anfangen'?", choices: ["empezar", "terminar", "continuar", "parar"], correct: "empezar" },
+    { question: "'wenn'?", choices: ["si", "cuando", "porque", "mientras"], correct: "si" },
+    { question: "'das Geld'?", choices: ["el dinero", "la plata", "el oro", "el valor"], correct: "el dinero" },
+    { question: "'notwendig'?", choices: ["necesario, -a", "opcional", "posible", "fácil"], correct: "necesario, -a" },
+    { question: "'lustig'?", choices: ["divertido, -a", "aburrido, -a", "triste", "malo"], correct: "divertido, -a" },
+    { question: "'man muss'?", choices: ["hay que", "se puede", "debe ser", "es posible"], correct: "hay que" },
+    { question: "'das Salz'?", choices: ["la sal", "el azúcar", "la pimienta", "el aceite"], correct: "la sal" },
+    { question: "'das Ei'?", choices: ["el huevo", "el pan", "el queso", "la leche"], correct: "el huevo" },
+    { question: "'das Problem'?", choices: ["el problema", "la solución", "la respuesta", "la pregunta"], correct: "el problema" },
+    { question: "'bringen'?", choices: ["traer", "llevar", "tomar", "dar"], correct: "traer" },
+    { question: "'schnell'?", choices: ["rápido, -a", "lento, -a", "difícil", "fácil"], correct: "rápido, -a" },
+    { question: "'bestellen'?", choices: ["pedir", "comprar", "coger", "tomar"], correct: "pedir" }
+];
+           
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            const shuffledQuestions = shuffleArray([...questions]);
+            let currentQuestionIndex = 0;
+            let correctAnswers = 0;
+            let answerChoicesCount = 4;
+            let progressStarted = false;
+
+            const questionContainer = document.getElementById("question");
+            const choicesContainer = document.getElementById("choices");
+            const progressBarFill = document.getElementById("progress-fill");
+            const difficultySelect = document.getElementById("difficulty-select");
+
+            difficultySelect.addEventListener("change", (event) => {
+                switch (event.target.value) {
+                    case "easy":
+                        answerChoicesCount = 2;
+                        break;
+                    case "medium":
+                        answerChoicesCount = 4;
+                        break;
+                    case "hard":
+                        answerChoicesCount = 6;
+                        break;
+                }
+                resetQuiz(); // Quiz automatisch neu starten und Fortschrittsbalken zurücksetzen, wenn Schwierigkeitsgrad geändert wird
+            });
+
+            function loadQuestion() {
+                const questionData = shuffledQuestions[currentQuestionIndex];
+                questionContainer.textContent = questionData.question;
+                choicesContainer.innerHTML = "";
+
+                let allChoices = [questionData.correct];
+                while (allChoices.length < answerChoicesCount) {
+                    const randomChoice = questions.flatMap(q => q.choices)[Math.floor(Math.random() * questions.length)];
+                    if (!allChoices.includes(randomChoice)) allChoices.push(randomChoice);
+                }
+                const shuffledChoices = shuffleArray(allChoices);
+
+                shuffledChoices.forEach(choice => {
+                    const button = document.createElement("button");
+                    button.classList.add("choiceButton");
+                    button.textContent = choice;
+                    button.onclick = () => handleAnswer(button, choice);
+                    choicesContainer.appendChild(button);
+                });
+            }
+
+            function handleAnswer(button, selectedChoice) {
+                const questionData = shuffledQuestions[currentQuestionIndex];
+                if (selectedChoice === questionData.correct) {
+                    button.classList.add("correct");
+                    correctAnswers++;
+                    if (!progressStarted) {
+                        progressStarted = true;
+                    }
+                    updateProgressBar();
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        if (currentQuestionIndex < shuffledQuestions.length) {
+                            loadQuestion();
+                        } else {
+                            showCompletionMessage();
+                        }
+                    }, 1000);
+                } else {
+                    button.classList.add("incorrect");
+                    setTimeout(() => button.classList.remove("incorrect"), 1000);
+                }
+            }
+
+            function updateProgressBar() {
+                if (progressStarted) {
+                    const progressPercent = (correctAnswers / shuffledQuestions.length) * 100;
+                    progressBarFill.style.width = `${progressPercent}%`;
+                }
+            }
+
+            function showCompletionMessage() {
+                let countdown = 5;
+                questionContainer.textContent = `¡Bravo! Volver a empezar en ${countdown} segundos...`;
+                choicesContainer.innerHTML = "";
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    questionContainer.textContent = `¡Bravo! Volver a empezar en ${countdown} segundos...`;
+                    if (countdown === 0) {
+                        clearInterval(countdownInterval);
+                        resetQuiz();
+                    }
+                }, 1000);
+            }
+
+            function resetQuiz() {
+                currentQuestionIndex = 0;
+                correctAnswers = 0;
+                progressStarted = false;
+                progressBarFill.style.width = "0%"; // Fortschrittsbalken zurücksetzen
+                loadQuestion();
+            }
+
+            loadQuestion();
+        });
+    </script>
+</body>
+</html>

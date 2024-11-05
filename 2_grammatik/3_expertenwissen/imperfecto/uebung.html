@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Übungen zum Imperfecto</title>
+    <style>
+        /* Grundlegendes Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #FFFFFF;
+            color: #333;
+        }
+
+        h1 {
+            color: #000000; /* Überschrift in Schwarz */
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .dropdown {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .exercise-section {
+            background-color: #FFFFFF;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: left;
+            display: none;
+        }
+
+        .exercise-section.active {
+            display: block;
+        }
+
+        .exercise-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .exercise-item {
+            background-color: #FFFFFF;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1em;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+        }
+
+        /* Anpassung des Drop-Down-Stils und Schriftart */
+        select, input[type="text"] {
+            padding: 8px;
+            font-size: 1em;
+            font-family: Arial, sans-serif; /* Gleiche Schriftart wie der Rest der Seite */
+            border-radius: 5px;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+            background-color: #FFFFFF;
+            color: #333;
+            transition: border-color 0.3s ease;
+            appearance: none;
+        }
+
+        /* Feedback für richtig, fast richtig und falsch */
+        .correct {
+            background-color: #A7E3A7 !important; /* Grün bei korrekter Antwort */
+            border-color: #A7E3A7 !important;
+        }
+
+        .almost-correct {
+            background-color: #FFD966 !important; /* Gelb bei fast richtiger Antwort */
+            border-color: #FFD966 !important;
+        }
+
+        .incorrect {
+            animation: incorrectFeedback 0.5s;
+            border-color: #EFA7A7 !important; /* Rotes Aufleuchten der Umrandung */
+        }
+
+        /* Animationen für visuelles Feedback */
+        @keyframes incorrectFeedback {
+            0% { border-color: #C2E0C6; }
+            50% { border-color: #EFA7A7; transform: translateX(-2px); }
+            100% { border-color: #C2E0C6; transform: translateX(0); }
+        }
+
+        /* Anpassung der Zurück-Buttons */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .buttons a {
+            text-decoration: none;
+            padding: 12px 20px;
+            margin-top: 10px;
+            margin: 0 10px;
+            border-radius: 8px;
+            color: #000000; /* Schwarze Schriftfarbe */
+            background-color: #FFFFFF; /* Weißer Hintergrund */
+            font-size: 1em;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+            transition: background-color 0.3s;
+        }
+
+        .buttons a:hover {
+            background-color: #EEEEEE;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdown = document.getElementById("difficulty-select");
+            const sections = document.querySelectorAll(".exercise-section");
+
+            // Funktion zur zufälligen Anordnung der Optionen im Dropdown-Menü
+            function shuffleOptions(selectElement) {
+                const options = Array.from(selectElement.options).slice(1); // Ohne leere Option
+                options.sort(() => Math.random() - 0.5);
+                options.forEach(option => selectElement.appendChild(option));
+            }
+
+            dropdown.addEventListener("change", function() {
+                sections.forEach(section => {
+                    section.classList.remove("active");
+                });
+                document.getElementById(dropdown.value).classList.add("active");
+            });
+
+            document.querySelectorAll(".exercise-item select").forEach(select => {
+                // Leere Standardoption hinzufügen
+                const placeholderOption = document.createElement("option");
+                placeholderOption.value = "";
+                placeholderOption.textContent = "";
+                select.insertBefore(placeholderOption, select.firstChild);
+                select.selectedIndex = 0; // Startet mit leerer Option
+                shuffleOptions(select);
+
+                select.addEventListener("change", function() {
+                    const correctAnswer = this.getAttribute("data-answer");
+                    if (this.value === correctAnswer) {
+                        this.classList.add("correct");
+                        this.disabled = true; // Antwort wird fixiert
+                    } else {
+                        this.classList.add("incorrect");
+                        setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
+                    }
+                });
+            });
+
+            // Toleranz für bis zu 2 Tippfehler bei Schwierigkeitsgrad "Schwierig"
+            function levenshtein(a, b) {
+                const matrix = [];
+                let i, j;
+                if (!a.length) return b.length;
+                if (!b.length) return a.length;
+
+                for (i = 0; i <= b.length; i++) {
+                    matrix[i] = [i];
+                }
+                for (j = 0; j <= a.length; j++) {
+                    matrix[0][j] = j;
+                }
+                for (i = 1; i <= b.length; i++) {
+                    for (j = 1; j <= a.length; j++) {
+                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+                        }
+                    }
+                }
+                return matrix[b.length][a.length];
+            }
+
+            document.querySelectorAll(".exercise-item input[type='text']").forEach(input => {
+                input.addEventListener("input", function() {
+                    const correctAnswer = this.getAttribute("data-answer");
+                    const distance = levenshtein(this.value.toLowerCase(), correctAnswer.toLowerCase());
+
+                    if (distance === 0) { // Ganz korrekte Antwort
+                        this.classList.add("correct");
+                        this.classList.remove("incorrect", "almost-correct");
+                        this.disabled = true; // Antwort fixieren
+                    } else if (distance <= 2) { // Fast richtige Antwort (bis zu 2 Tippfehler)
+                        setTimeout(() => {
+                            if (!this.disabled && this.value.toLowerCase() === this.value.toLowerCase()) {
+                                this.classList.add("almost-correct");
+                                this.classList.remove("correct", "incorrect");
+                                this.disabled = true; // Antwort fixieren
+                            }
+                        }, 1000); // Verzögertes Feedback für fast korrekte Antworten
+                    } else { // Falsche Antwort
+                        this.classList.add("incorrect");
+                        setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Übungen zum Imperfecto</h1>
+
+        <!-- Dropdown zur Auswahl des Schwierigkeitsgrades -->
+        <div class="dropdown">
+            <label for="difficulty-select">Schwierigkeitsgrad wählen:</label>
+            <select id="difficulty-select">
+                <option value="einfach">Einfach</option>
+                <option value="mittel" selected>Mittel</option>
+                <option value="schwierig">Schwierig</option>
+            </select>
+        </div>
+
+        <!-- Einfache Aufgaben -->
+        <div id="einfach" class="exercise-section">
+            <h2>Einfach</h2>
+            <p>Wähle die richtige Form des Verbs im Imperfecto (2 Antwortmöglichkeiten):</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. Yo <select data-answer="hablaba">
+                    <option value="hablaba">hablaba</option>
+                    <option value="hablaban">hablaban</option>
+                </select> mit meinen Freunden jeden Tag. (hablar)</li>
+                <li class="exercise-item">2. Tú <select data-answer="jugabas">
+                    <option value="jugabas">jugabas</option>
+                    <option value="jugaban">jugaban</option>
+                </select> im Park. (jugar)</li>
+                <!-- Weitere Fragen folgen dem gleichen Muster -->
+            </ul>
+        </div>
+
+        <!-- Mittlere Aufgaben -->
+        <div id="mittel" class="exercise-section active">
+            <h2>Mittel</h2>
+            <p>Wähle die richtige Form des Verbs im Imperfecto (4 Antwortmöglichkeiten) und übersetze ins Deutsche:</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. Yo <select data-answer="visitaba">
+                    <option value="visitaba">visitaba</option>
+                    <option value="visitabas">visitabas</option>
+                    <option value="visitaban">visitaban</option>
+                    <option value="visitábamos">visitábamos</option>
+                </select> jeden Sommer meine Großeltern. (visitar)</li>
+                <li class="exercise-item">2. Tú <select data-answer="pensabas">
+                    <option value="pensaba">pensaba</option>
+                    <option value="pensabas">pensabas</option>
+                    <option value="pensaban">pensaban</option>
+                    <option value="pensábamos">pensábamos</option>
+                </select> über die Zukunft nach. (pensar)</li>
+                <!-- Weitere Fragen folgen dem gleichen Muster -->
+            </ul>
+        </div>
+
+        <!-- Schwierige Aufgaben -->
+        <div id="schwierig" class="exercise-section">
+            <h2>Schwierig</h2>
+            <p>Setze das Verb im Imperfecto ein und erkläre, warum das Imperfecto verwendet wird:</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. Meine Eltern <input type="text" data-answer="trabajaban"> in einer Fabrik, als sie jung waren. (trabajar)</li>
+                <li class="exercise-item">2. Wir <input type="text" data-answer="íbamos"> jeden Samstag ins Kino. (ir)</li>
+                <!-- Weitere Fragen folgen dem gleichen Muster -->
+            </ul>
+        </div>
+
+        <!-- Button zum Zurückkehren -->
+        <div class="buttons">
+            <a href="index.html">Zurück zur Startseite</a>
+        </div>
+    </div>
+
+</body>
+</html>

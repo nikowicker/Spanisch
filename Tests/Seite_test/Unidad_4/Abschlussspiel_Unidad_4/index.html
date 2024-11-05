@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momento final: Unidad 4</title>
+    <style>
+        /* Minimalistisches Design mit sanften Pastelltönen */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f4f6;
+            color: #2b2b2b;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            background: linear-gradient(135deg, #82c8a0, #b3a4b9);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8em;
+            border-radius: 10px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+            max-width: 600px;
+        }
+
+        /* Fortschrittsbalken Styling */
+        #progress-bar-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #e0e0e0;
+            height: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #82c8a0;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .question {
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            width: 100%;
+            margin: 30px 0;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            color: #4b4e6d;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 1.2rem;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #d3b4e4;
+            border-radius: 8px;
+            margin-top: 10px;
+            background-color: #ffffff;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Animation für korrektes Aufleuchten */
+        @keyframes correct-flash {
+            0% { background-color: #ffffff; }
+            50% { background-color: #9ddfbe; }
+            100% { background-color: #ffffff; }
+        }
+
+        /* Animation für fast richtige Antwort (gelb) */
+        @keyframes close-enough-flash {
+            0% { background-color: #ffffff; }
+            50% { background-color: #f8e7a4; }
+            100% { background-color: #ffffff; }
+        }
+
+        /* Animation für falsche Antwort (rot) */
+        @keyframes incorrect-flash {
+            0% { background-color: #ffffff; }
+            50% { background-color: #f8d7da; }
+            100% { background-color: #ffffff; }
+        }
+
+        /* Feedback Farben mit Animationen */
+        .correct {
+            animation: correct-flash 0.5s ease-in-out;
+            border-color: #9ddfbe;
+        }
+
+        .close-enough {
+            animation: close-enough-flash 0.5s ease-in-out;
+            border-color: #f8e7a4;
+        }
+
+        .incorrect {
+            animation: incorrect-flash 0.5s ease-in-out;
+            border-color: #f8d7da;
+        }
+
+        /* Multiple-Choice-Antworten in zentrierten, hellgrünen Boxen */
+        label.option {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: calc(100% - 20px);
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 1.1rem;
+            background-color: #e6f4ea; /* Helles Pastellgrün */
+            color: #2b2b2b;
+            border: 1px solid #b3e0c4;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.2s;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Eingabefelder für Radio-Buttons ausblenden */
+        label.option input[type="radio"] {
+            display: none;
+        }
+
+        /* Hover- und Auswahlzustand */
+        label.option:hover {
+            background-color: #d0ead6;
+        }
+
+        input[type="radio"]:checked + label.option {
+            background-color: #a8d5ba;
+            color: white;
+        }
+
+        /* Feedback für korrekte und inkorrekte Antworten */
+        label.option.correct {
+            background-color: #9ddfbe;
+            color: white;
+        }
+
+        label.option.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .hint-message {
+            font-size: 1.1rem;
+            color: #721c24;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #end-message {
+            display: none;
+            text-align: center;
+            font-size: 1.5rem;
+            color: #4b4e6d;
+            margin-top: 20px;
+        }
+
+        /* Button Styling */
+        #restart-button, #submit-button, #back-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #a8d5ba;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.2s;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        #restart-button {
+            background-color: #82c8a0;
+        }
+
+        #back-button {
+            background-color: #4b4e6d;
+        }
+
+        #restart-button:hover, #submit-button:hover, #back-button:hover {
+            background-color: #7ab593;
+            transform: translateY(-3px);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            input[type="text"], #submit-button, #restart-button, #back-button {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Momento final Unidad 4</h1>
+    </header>
+    
+    <div id="quiz-section">
+        <div id="question-container" class="question"></div>
+    </div>
+
+    <div id="hint-message" class="hint-message">richtige Antwort: <span id="correct-answer"></span>.</div>
+
+    <div id="end-message"></div>
+<!-- Quiz-Neustart-Button mit anfänglicher Ausblendung -->
+<button id="restart-button" onclick="restartQuiz()" style="display: none;">Quiz neu starten</button>
+
+<!-- Fortschrittsbalken unter dem Quiz -->
+<div id="progress-bar-container">
+    <div id="progress-bar"></div>
+</div>
+
+<!-- Zurück-Button am Ende der Seite -->
+<a href="../index.html" id="back-button">Zurück</a>
+
+
+    <script>
+        let currentQuestionIndex = 0;
+        let attemptCount = 0;
+        let currentInput = null;
+
+      const deutschSpanischFragenPool = [
+    { question: "Übersetze: 'Wir machen Sport'", answer: "Hacemos deporte" },
+    { question: "Übersetze 'Der Junge geht einkaufen.' ins Spanische", answer: "el chico va de compras" },
+    { question: "Übersetze 'Fahrrad fahren' ins Spanische", answer: "montar en bici" },
+    { question: "Übersetze 'die Musik' ins Spanische", answer: "la música" },
+    { question: "Übersetze 'ihr klettert' ins Spanische", answer: "escaláis" },
+    { question: "Übersetze 'sich ausruhen' ins Spanische", answer: "descansar" },
+    { question: "Übersetze 'ich lese ein Buch' ins Spanische", answer: "leo un libro" },
+    { question: "Übersetze 'machen' ins Spanische", answer: "hacer" },
+    { question: "Übersetze 'Laura macht Sport' ins Spanische", answer: "Laura hace deporte" },
+    { question: "Übersetze 'sehen' ins Spanische", answer: "ver" },
+    { question: "Übersetze 'ein Buch lesen' ins Spanische", answer: "leer un libro" },
+    { question: "Übersetze 'die Gitarre' ins Spanische", answer: "la guitarra" },
+    { question: "Übersetze 'der Comic' ins Spanische", answer: "el cómic" },
+    { question: "Übersetze 'faul' ins Spanische", answer: "vago" },
+    { question: "Übersetze 'rennen' ins Spanische", answer: "correr" }
+];
+
+const spanischDeutschFragenPool = [
+    { question: "Übersetze 'Nosotros chateamos' ins Deutsche", answer: "wir chatten" },
+    { question: "Übersetze 'la música me gusta' ins Deutsche", answer: "die Musik gefällt mir" },
+    { question: "Übersetze 'hacer deporte es importante' ins Deutsche", answer: "Sport machen ist wichtig" },
+    { question: "Übersetze 'el regalo es bonito' ins Deutsche", answer: "das Geschenk ist schön" },
+    { question: "Übersetze 'el libro' ins Deutsche", answer: "das Buch" },
+    { question: "Übersetze 'tocar un instrumento es difícil' ins Deutsche", answer: "ein Instrument spielen ist schwierig" },
+    { question: "Übersetze 'Los chicos ven la tele' ins Deutsche", answer: "Die Jungen gucken Fernsehen" },
+    { question: "Übersetze 'el partido de fútbol es muy intenso' ins Deutsche", answer: "das Fußballspiel ist sehr intensiv" },
+    { question: "Übersetze 'la película es muy romántica' ins Deutsche", answer: "der Film ist sehr romantisch" },
+    { question: "Übersetze 'Necesito ayuda' ins Deutsche", answer: "ich brauche Hilfe" },
+    { question: "Übersetze 'el zoo' ins Deutsche", answer: "der Zoo" },
+    { question: "Übersetze 'Me gusta ir al cine' ins Deutsche", answer: "Ich gehe gerne ins Kino" },
+    { question: "Übersetze 'la actividad' ins Deutsche", answer: "die Aktivität" },
+    { question: "Übersetze 'Los hermanos viven en Madrid' ins Deutsche", answer: "Die Brüder wohnen in Madrid" },
+    { question: "Übersetze 'Mi cumpleaños es en febrero' ins Deutsche", answer: "mein Geburtstag ist im Februar" }
+];
+
+const multipleChoiceFragenPool = [
+    { question: "Was bedeutet 'hacer deporte' auf Deutsch?", options: ["Sport machen", "Einkaufen", "Musik machen", "Sich ausruhen"], answer: "Sport machen" },
+    { question: "Was bedeutet 'la guitarra' auf Deutsch?", options: ["Gitarre", "Buch", "Geschenk", "Stuhl"], answer: "Gitarre" },
+    { question: "Was bedeutet 'cuidar de' auf Deutsch?", options: ["kümmern um", "machen", "einkaufen", "lesen"], answer: "kümmern um" },
+    { question: "Was bedeutet 'la tele' auf Deutsch?", options: ["das Fernsehen", "das Buch", "das Fahrrad", "der Zoo"], answer: "das Fernsehen" },
+    { question: "Was bedeutet 'vago' auf Deutsch?", options: ["faul", "immer", "Sport", "aktiv"], answer: "faul" },
+    { question: "Was bedeutet 'el partido de fútbol' auf Deutsch?", options: ["das Fußballspiel", "die Musik", "der Geburtstag", "der Film"], answer: "das Fußballspiel" },
+    { question: "Was bedeutet 'la encuesta' auf Deutsch?", options: ["die Umfrage", "die Hilfe", "die Schule", "der Sport"], answer: "die Umfrage" },
+    { question: "Was bedeutet 'la actividad' auf Deutsch?", options: ["die Aktivität", "das Haus", "der Plan", "die Woche"], answer: "die Aktivität" },
+    { question: "Was bedeutet 'tocar' auf Deutsch?", options: ["spielen (Instrument)", "machen", "laufen", "schreiben"], answer: "spielen (Instrument)" },
+    { question: "Was bedeutet 'el zoo' auf Deutsch?", options: ["der Zoo", "die Überraschung", "das Haus", "die Musik"], answer: "der Zoo" },
+    { question: "Was bedeutet 'gustar' auf Deutsch?", options: ["gefallen", "spielen", "wohnen", "gehen"], answer: "gefallen" },
+    { question: "Was bedeutet 'el cumpleaños' auf Deutsch?", options: ["der Geburtstag", "das Geschenk", "das Jahr", "das Spiel"], answer: "der Geburtstag" },
+    { question: "Was bedeutet 'el partido' auf Deutsch?", options: ["das Spiel", "die Woche", "der Sport", "das Haus"], answer: "das Spiel" },
+    { question: "Was bedeutet 'hacer' auf Deutsch?", options: ["machen", "schlafen", "essen", "laufen"], answer: "machen" },
+    { question: "Was bedeutet 'leer' auf Deutsch?", options: ["lesen", "laufen", "schlafen", "einkaufen"], answer: "lesen" }
+];
+
+
+        function getRandomQuestions(pool, num) {
+            const shuffled = [...pool];
+            shuffleArray(shuffled);
+            return shuffled.slice(0, num);
+        }
+
+        const deutschSpanischFragen = getRandomQuestions(deutschSpanischFragenPool, 6);
+        const spanischDeutschFragen = getRandomQuestions(spanischDeutschFragenPool, 6);
+        const multipleChoiceFragen = getRandomQuestions(multipleChoiceFragenPool, 6);
+
+        const allQuestions = [...deutschSpanischFragen, ...spanischDeutschFragen, ...multipleChoiceFragen];
+        shuffleArray(allQuestions);
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function checkAnswerWithTolerance(correctAnswer, userAnswer, tolerance = 2) {
+            return levenshtein(correctAnswer.toLowerCase(), userAnswer.toLowerCase()) <= tolerance;
+        }
+
+        function levenshtein(a, b) {
+            const matrix = Array.from({ length: a.length + 1 }, (_, i) =>
+                Array.from({ length: b.length + 1 }, (_, j) => (j === 0 ? i : j === 0 ? j : 0))
+            );
+
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    if (a[i - 1] === b[j - 1]) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j - 1] + 1
+                        );
+                    }
+                }
+            }
+
+            return matrix[a.length][b.length];
+        }
+
+        function checkAnswer(correctAnswer, answerInput) {
+            answerInput.classList.remove("correct", "incorrect", "close-enough");
+            if (checkAnswerWithTolerance(correctAnswer, answerInput.value, 2)) {
+                if (answerInput.value.toLowerCase() === correctAnswer.toLowerCase()) {
+                    answerInput.classList.add("correct");
+                } else {
+                    answerInput.classList.add("close-enough");
+                }
+                setTimeout(nextQuestion, 1000);
+            } else {
+                attemptCount++;
+                answerInput.classList.add("incorrect");
+                setTimeout(() => answerInput.classList.remove("incorrect"), 500);
+                if (attemptCount >= 3) {
+                    showHint(correctAnswer);
+                    attemptCount = 0;
+                }
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / allQuestions.length) * 100;
+            document.getElementById("progress-bar").style.width = `${progress}%`;
+        }
+
+        function displayQuestion() {
+            const questionContainer = document.getElementById("question-container");
+            questionContainer.innerHTML = '';
+            document.getElementById("hint-message").style.display = "none";
+
+            const currentQuestion = allQuestions[currentQuestionIndex];
+
+            const questionText = document.createElement("p");
+            questionText.textContent = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
+            questionContainer.appendChild(questionText);
+
+            if (currentQuestion.options) {
+                shuffleArray(currentQuestion.options);
+                currentQuestion.options.forEach(option => {
+                    const optionLabel = document.createElement("label");
+                    optionLabel.classList.add("option"); // Fügt die Klasse "option" hinzu
+                    const optionInput = document.createElement("input");
+                    optionInput.type = "radio";
+                    optionInput.name = "option";
+                    optionInput.value = option;
+                    optionInput.onclick = () => checkMCQ(currentQuestion.answer, option, optionLabel);
+
+                    optionLabel.appendChild(optionInput);
+                    optionLabel.append(option); // Entfernt das Leerzeichen vor dem Text
+                    questionContainer.appendChild(optionLabel);
+                    questionContainer.appendChild(document.createElement("br"));
+                });
+            } else {
+                currentInput = document.createElement("input");
+                currentInput.type = "text";
+                questionContainer.appendChild(currentInput);
+
+                const submitButton = document.createElement("button");
+                submitButton.id = "submit-button";
+                submitButton.textContent = "Bestätigen";
+                submitButton.style.display = "inline-block";
+                submitButton.onclick = () => checkAnswer(currentQuestion.answer, currentInput);
+                questionContainer.appendChild(submitButton);
+
+                currentInput.addEventListener("input", toggleSubmitButton);
+                toggleSubmitButton();
+            }
+
+            attemptCount = 0;
+        }
+
+        function toggleSubmitButton() {
+            const submitButton = document.getElementById("submit-button");
+            submitButton.disabled = !currentInput.value.trim();
+        }
+
+        function checkMCQ(correctAnswer, userAnswer, optionLabel) {
+            optionLabel.classList.remove("correct", "incorrect");
+            if (userAnswer === correctAnswer) {
+                optionLabel.classList.add("correct");
+                setTimeout(nextQuestion, 1000);
+            } else {
+                attemptCount++;
+                optionLabel.classList.add("incorrect");
+                setTimeout(() => optionLabel.classList.remove("incorrect"), 500);
+                if (attemptCount >= 3) {
+                    showHint(correctAnswer);
+                }
+            }
+        }
+
+        function showHint(correctAnswer) {
+            document.getElementById("correct-answer").textContent = correctAnswer;
+            document.getElementById("hint-message").style.display = "block";
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < allQuestions.length) {
+                updateProgressBar();
+                displayQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+     function endQuiz() {
+    const questionContainer = document.getElementById("question-container");
+    questionContainer.style.display = "none";
+    const endMessage = document.getElementById("end-message");
+    endMessage.textContent = "Du hast das Quiz abgeschlossen. Wie schätzt du deinen Lernfortschritt ein?";
+    endMessage.style.display = "block";
+    document.getElementById("restart-button").style.display = "inline-block"; // Zeigt den Button an
+}
+
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            document.getElementById("question-container").style.display = "flex";
+            updateProgressBar();
+            document.getElementById("end-message").style.display = "none";
+            document.getElementById("restart-button").style.display = "none";
+            displayQuestion();
+        }
+
+        displayQuestion();
+        updateProgressBar();
+    </script>
+</body>
+</html>

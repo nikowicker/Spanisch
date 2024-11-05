@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Übungen zu El Indefinido</title>
+    <style>
+        /* Grundlegendes Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #FFFFFF;
+            color: #333;
+        }
+
+        h1 {
+            color: #000000; /* Überschrift in Schwarz */
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .dropdown {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .exercise-section {
+            background-color: #FFFFFF;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: left;
+            display: none;
+        }
+
+        .exercise-section.active {
+            display: block;
+        }
+
+        .exercise-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .exercise-item {
+            background-color: #FFFFFF;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1em;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+        }
+
+        /* Anpassung des Drop-Down-Stils und Schriftart */
+        select, input[type="text"] {
+            padding: 8px;
+            font-size: 1em;
+            font-family: Arial, sans-serif; /* Gleiche Schriftart wie der Rest der Seite */
+            border-radius: 5px;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+            background-color: #FFFFFF;
+            color: #333;
+            transition: border-color 0.3s ease;
+            appearance: none;
+        }
+
+        /* Feedback für richtig, fast richtig und falsch */
+        .correct {
+            background-color: #A7E3A7 !important; /* Grün bei korrekter Antwort */
+            border-color: #A7E3A7 !important;
+        }
+
+        .almost-correct {
+            background-color: #FFD966 !important; /* Gelb bei fast richtiger Antwort */
+            border-color: #FFD966 !important;
+        }
+
+        .incorrect {
+            animation: incorrectFeedback 0.5s;
+            border-color: #EFA7A7 !important; /* Rotes Aufleuchten der Umrandung */
+        }
+
+        /* Animationen für visuelles Feedback */
+        @keyframes incorrectFeedback {
+            0% { border-color: #C2E0C6; }
+            50% { border-color: #EFA7A7; transform: translateX(-2px); }
+            100% { border-color: #C2E0C6; transform: translateX(0); }
+        }
+
+        /* Anpassung der Zurück-Buttons */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .buttons a {
+            text-decoration: none;
+            padding: 12px 20px;
+            margin-top: 10px;
+            margin: 0 10px;
+            border-radius: 8px;
+            color: #000000; /* Schwarze Schriftfarbe */
+            background-color: #FFFFFF; /* Weißer Hintergrund */
+            font-size: 1em;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+            transition: background-color 0.3s;
+        }
+
+        .buttons a:hover {
+            background-color: #EEEEEE;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdown = document.getElementById("difficulty-select");
+            const sections = document.querySelectorAll(".exercise-section");
+
+            dropdown.addEventListener("change", function() {
+                sections.forEach(section => {
+                    section.classList.remove("active");
+                });
+                document.getElementById(dropdown.value).classList.add("active");
+            });
+
+            document.querySelectorAll(".exercise-item select").forEach(select => {
+                // Leere Standardoption hinzufügen
+                const placeholderOption = document.createElement("option");
+                placeholderOption.value = "";
+                placeholderOption.textContent = "";
+                select.insertBefore(placeholderOption, select.firstChild);
+                select.selectedIndex = 0; // Startet mit leerer Option
+
+                select.addEventListener("change", function() {
+                    const correctAnswer = this.getAttribute("data-answer");
+                    if (this.value === correctAnswer) {
+                        this.classList.add("correct");
+                        this.disabled = true; // Antwort wird fixiert
+                    } else {
+                        this.classList.add("incorrect");
+                        setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
+                    }
+                });
+            });
+
+            document.querySelectorAll(".exercise-item input[type='text']").forEach(input => {
+                input.addEventListener("input", function() {
+                    const correctAnswer = this.getAttribute("data-answer").toLowerCase();
+                    const userAnswer = this.value.trim().toLowerCase();
+                    
+                    if (userAnswer === correctAnswer) {
+                        this.classList.add("correct");
+                        this.classList.remove("incorrect", "almost-correct");
+                        this.disabled = true; // Antwort fixieren
+                    } else if (levenshtein(userAnswer, correctAnswer) <= 2) {
+                        this.classList.add("almost-correct");
+                        this.classList.remove("correct", "incorrect");
+                    } else {
+                        this.classList.add("incorrect");
+                        this.classList.remove("correct", "almost-correct");
+                        setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
+                    }
+                });
+            });
+
+            function levenshtein(a, b) {
+                const matrix = [];
+                let i, j;
+                if (!a.length) return b.length;
+                if (!b.length) return a.length;
+
+                for (i = 0; i <= b.length; i++) {
+                    matrix[i] = [i];
+                }
+                for (j = 0; j <= a.length; j++) {
+                    matrix[0][j] = j;
+                }
+                for (i = 1; i <= b.length; i++) {
+                    for (j = 1; j <= a.length; j++) {
+                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+                        }
+                    }
+                }
+                return matrix[b.length][a.length];
+            }
+        });
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Übungen zu El Indefinido</h1>
+
+        <!-- Dropdown zur Auswahl des Schwierigkeitsgrades -->
+        <div class="dropdown">
+            <label for="difficulty-select">Schwierigkeitsgrad wählen:</label>
+            <select id="difficulty-select">
+                <option value="einfach">Einfach</option>
+                <option value="mittel" selected>Mittel</option>
+                <option value="schwierig">Schwierig</option>
+            </select>
+        </div>
+
+        <!-- Einfache Aufgaben -->
+        <div id="einfach" class="exercise-section">
+            <h2>Einfach</h2>
+            <p>Wähle die richtige Form: Indefinido (2 Antwortmöglichkeiten, nur regelmäßige Formen):</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. Yo <select data-answer="hablé">
+                    <option value=""></option>
+                    <option value="hablé">hablé</option>
+                    <option value="hablaste">hablaste</option>
+                </select> con mi madre. (hablar)</li>
+                <li class="exercise-item">2. Tú <select data-answer="comiste">
+                    <option value=""></option>
+                    <option value="comí">comí</option>
+                    <option value="comiste">comiste</option>
+                </select> una pizza. (comer)</li>
+                <li class="exercise-item">3. Él <select data-answer="vivió">
+                    <option value=""></option>
+                    <option value="viví">viví</option>
+                    <option value="vivió">vivió</option>
+                </select> en Madrid. (vivir)</li>
+                <li class="exercise-item">4. Nosotros <select data-answer="trabajamos">
+                    <option value=""></option>
+                    <option value="trabajé">trabajé</option>
+                    <option value="trabajamos">trabajamos</option>
+                </select> todo el día. (trabajar)</li>
+                <li class="exercise-item">5. Ellos <select data-answer="comieron">
+                    <option value=""></option>
+                    <option value="comieron">comieron</option>
+                    <option value="comiste">comiste</option>
+                </select> mucho. (comer)</li>
+                <li class="exercise-item">6. Yo <select data-answer="aprendí">
+                    <option value=""></option>
+                    <option value="aprendí">aprendí</option>
+                    <option value="aprendiste">aprendiste</option>
+                </select> español. (aprender)</li>
+                <li class="exercise-item">7. Tú <select data-answer="escribiste">
+                    <option value=""></option>
+                    <option value="escribiste">escribiste</option>
+                    <option value="escribí">escribí</option>
+                </select> una carta. (escribir)</li>
+                <li class="exercise-item">8. Él <select data-answer="bailó">
+                    <option value=""></option>
+                    <option value="bailó">bailó</option>
+                    <option value="bailé">bailé</option>
+                </select> en la fiesta. (bailar)</li>
+                <li class="exercise-item">9. Nosotros <select data-answer="bebimos">
+                    <option value=""></option>
+                    <option value="bebí">bebí</option>
+                    <option value="bebimos">bebimos</option>
+                </select> agua. (beber)</li>
+                <li class="exercise-item">10. Ellos <select data-answer="decidieron">
+                    <option value=""></option>
+                    <option value="decidí">decidí</option>
+                    <option value="decidieron">decidieron</option>
+                </select> ir al cine. (decidir)</li>
+            </ul>
+        </div>
+
+        <!-- Mittlere Aufgaben -->
+        <div id="mittel" class="exercise-section active">
+            <h2>Mittel</h2>
+            <p>Wähle die richtige Form: Indefinido (4 Antwortmöglichkeiten, nur regelmäßige Formen) und übersetze ins Deutsche:</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. Yo <select data-answer="caminé">
+                    <option value=""></option>
+                    <option value="caminé">caminé</option>
+                    <option value="caminaste">caminaste</option>
+                    <option value="caminó">caminó</option>
+                    <option value="caminamos">caminamos</option>
+                </select> por el parque. (Ich ging durch den Park)</li>
+                <li class="exercise-item">2. Tú <select data-answer="comiste">
+                    <option value=""></option>
+                    <option value="comí">comí</option>
+                    <option value="comiste">comiste</option>
+                    <option value="comió">comió</option>
+                    <option value="comimos">comimos</option>
+                </select> una manzana. (Du aßest einen Apfel)</li>
+                <li class="exercise-item">3. Él <select data-answer="corrió">
+                    <option value=""></option>
+                    <option value="corrí">corrí</option>
+                    <option value="corriste">corriste</option>
+                    <option value="corrió">corrió</option>
+                    <option value="corrimos">corrimos</option>
+                </select> muy rápido. (Er rannte sehr schnell)</li>
+                <li class="exercise-item">4. Nosotros <select data-answer="viajamos">
+                    <option value=""></option>
+                    <option value="viajé">viajé</option>
+                    <option value="viajaste">viajaste</option>
+                    <option value="viajamos">viajamos</option>
+                    <option value="viajaron">viajaron</option>
+                </select> a Francia. (Wir reisten nach Frankreich)</li>
+                <li class="exercise-item">5. Ellos <select data-answer="aprendieron">
+                    <option value=""></option>
+                    <option value="aprendí">aprendí</option>
+                    <option value="aprendiste">aprendiste</option>
+                    <option value="aprendió">aprendió</option>
+                    <option value="aprendieron">aprendieron</option>
+                </select> mucho en la escuela. (Sie lernten viel in der Schule)</li>
+                <li class="exercise-item">6. Yo <select data-answer="tomé">
+                    <option value=""></option>
+                    <option value="tomé">tomé</option>
+                    <option value="tomaste">tomaste</option>
+                    <option value="tomó">tomó</option>
+                    <option value="tomamos">tomamos</option>
+                </select> un café. (Ich trank einen Kaffee)</li>
+                <li class="exercise-item">7. Tú <select data-answer="llegaste">
+                    <option value=""></option>
+                    <option value="llegué">llegué</option>
+                    <option value="llegaste">llegaste</option>
+                    <option value="llegó">llegó</option>
+                    <option value="llegamos">llegamos</option>
+                </select> tarde. (Du kamst spät an)</li>
+                <li class="exercise-item">8. Él <select data-answer="trabajó">
+                    <option value=""></option>
+                    <option value="trabajé">trabajé</option>
+                    <option value="trabajaste">trabajaste</option>
+                    <option value="trabajó">trabajó</option>
+                    <option value="trabajamos">trabajamos</option>
+                </select> en la oficina. (Er arbeitete im Büro)</li>
+                <li class="exercise-item">9. Nosotros <select data-answer="escuchamos">
+                    <option value=""></option>
+                    <option value="escuché">escuché</option>
+                    <option value="escuchaste">escuchaste</option>
+                    <option value="escuchamos">escuchamos</option>
+                    <option value="escucharon">escucharon</option>
+                </select> música. (Wir hörten Musik)</li>
+                <li class="exercise-item">10. Ellos <select data-answer="nacieron">
+                    <option value=""></option>
+                    <option value="nací">nací</option>
+                    <option value="naciste">naciste</option>
+                    <option value="nació">nació</option>
+                    <option value="nacieron">nacieron</option>
+                </select> en España. (Sie wurden in Spanien geboren)</li>
+            </ul>
+        </div>
+
+        <!-- Schwierige Aufgaben -->
+        <div id="schwierig" class="exercise-section">
+            <h2>Schwierig</h2>
+            <p>Setze das Verb in der richtigen Form des Indefinido ein (nur regelmäßige Formen) und erkläre, warum das Indefinido verwendet wird:</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. Ayer yo <input type="text" data-answer="compré"> un libro. (kaufen)</li>
+                <li class="exercise-item">2. Tú <input type="text" data-answer="estudiaste"> mucho para el examen. (lernen)</li>
+                <li class="exercise-item">3. Él <input type="text" data-answer="corrió"> en la maratón. (laufen)</li>
+                <li class="exercise-item">4. Nosotros <input type="text" data-answer="viajamos"> a México el verano pasado. (reisen)</li>
+                <li class="exercise-item">5. Ellos <input type="text" data-answer="decidieron"> quedarse en casa. (entscheiden)</li>
+                <li class="exercise-item">6. Yo <input type="text" data-answer="cociné"> la cena para mi familia. (kochen)</li>
+                <li class="exercise-item">7. Tú <input type="text" data-answer="escribiste"> una carta a tu amigo. (schreiben)</li>
+                <li class="exercise-item">8. Él <input type="text" data-answer="bailó"> toda la noche en la fiesta. (tanzen)</li>
+                <li class="exercise-item">9. Nosotros <input type="text" data-answer="bebimos"> jugo de naranja en el desayuno. (trinken)</li>
+                <li class="exercise-item">10. Ellos <input type="text" data-answer="limpiaron"> la casa el fin de semana pasado. (putzen)</li>
+            </ul>
+        </div>
+
+        <!-- Button zum Zurückkehren -->
+        <div class="buttons">
+            <a href="index.html">Zurück zur Startseite</a>
+        </div>
+    </div>
+
+</body>
+</html>

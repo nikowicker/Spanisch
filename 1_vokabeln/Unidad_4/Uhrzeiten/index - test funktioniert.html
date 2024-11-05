@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=no">
+    <title>Digitale Uhr mit spanischer Uhrzeit</title>
+    <style>
+        /* Basis-Stile */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100vh;
+            background-color: #f9f9f9;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Überschrift */
+        h1 {
+            font-size: 5vw;
+            color: #101010;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        /* Uhr-Container */
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #b4e4d0;
+            border-radius: 20px;
+            padding: 15px;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Uhr-Stile */
+        .clock {
+            color: red;
+            font-size: 8vw;
+            font-weight: bold;
+            background-color: black;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        /* Karteikarten-Stile */
+        .card-container {
+            position: absolute;
+            bottom: 150px; /* Nähe zur Uhr */
+            width: 180px;
+            height: 120px;
+            perspective: 1000px;
+            z-index: 10;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #ffd966; /* Einheitliche Farbe für beide Seiten */
+            color: #333;
+            font-size: 12px;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .card .card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Spezielle Farben für bestimmte Hinweiswörter */
+        .highlight-time {
+            color: #ff9a4d; /* Kräftiges Pastell-Orange für xx:05 */
+            font-weight: bold;
+        }
+        .highlight-word {
+            color: #ffbb33; /* Kräftiges Pastell Gelb/Orange für en punto */
+            font-weight: bold;
+        }
+
+        /* Input und Schaltflächen */
+        .input-container,
+        .arrow-container,
+        .spanish-time-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .time-input,
+        .arrow-button,
+        .spanish-time-button,
+        .ok-button {
+            font-size: 4vw;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .time-input {
+            font-size: 2vw;
+            width: 100%;
+            max-width: 200px;
+            border: 2px solid #b4e4d0;
+        }
+
+        /* Fehler- und Positiv-Animation */
+        .error {
+            animation: shake 0.3s ease, flash-red 0.3s ease;
+        }
+
+        .success {
+            animation: flash-green 0.3s ease;
+        }
+
+        .tolerance {
+            animation: flash-yellow 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes flash-red {
+            0%, 100% { border-color: #b4e4d0; background-color: inherit; }
+            50% { border-color: red; background-color: #ffd6d6; }
+        }
+
+        @keyframes flash-green {
+            0%, 100% { border-color: #b4e4d0; background-color: inherit; }
+            50% { border-color: green; background-color: #d6ffd6; }
+        }
+
+        @keyframes flash-yellow {
+            0%, 100% { border-color: #b4e4d0; background-color: inherit; }
+            50% { border-color: yellow; background-color: #ffffd6; }
+        }
+
+        .arrow-button {
+            background-color: #d9c7f5;
+            border: none;
+        }
+
+        .arrow-button:hover,
+        .spanish-time-button:hover,
+        .ok-button:hover {
+            background-color: #b4a0e8;
+        }
+
+        /* Rückgabe-Button */
+        .back-button {
+            position: fixed;
+            bottom: 60px; /* Button höher gerückt */
+            background-color: #d9c7f5;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 5vw;
+            border: none;
+            cursor: pointer;
+            color: #101010;
+            text-decoration: none;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            max-width: 150px;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background-color: #b4a0e8;
+        }
+
+        /* Countdown */
+        .countdown {
+            display: none;
+            font-size: 7vw;
+            font-weight: bold;
+            color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>¿Qué hora es?</h1>
+
+    <div class="clock-container">
+        <div id="clock" class="clock">00:00</div>
+
+        <div class="arrow-container" id="arrows">
+            <div>
+                <button class="arrow-button" onclick="adjustTime('hour', 1)">▲</button>
+                <button class="arrow-button" onclick="adjustTime('hour', -1)">▼</button>
+            </div>
+            <div>
+                <button class="arrow-button" onclick="adjustTime('minute', 5)">▲</button>
+                <button class="arrow-button" onclick="adjustTime('minute', -5)">▼</button>
+            </div>
+        </div>
+
+        <div class="input-container" id="inputContainer" style="display: none;">
+            <input type="text" id="timeInput" class="time-input" placeholder="¿Qué hora es?">
+            <button class="ok-button" onclick="checkInput()">OK</button>
+        </div>
+
+        <button id="spanish-time-button" class="spanish-time-button" onclick="checkMatch()">Ocho y media</button>
+
+        <div id="countdown" class="countdown">Tiempo: 10</div>
+    </div>
+
+    <!-- Karteikarten-Container, näher an der Uhr positioniert -->
+    <div class="card-container" onclick="flipCard()">
+        <div class="card" id="helpCard">
+            <!-- Vorderseite der Karteikarte -->
+            <div class="card-face card-front">
+                ¿Ayuda?
+            </div>
+            <!-- Rückseite der Karteikarte mit farbigen Hinweiswörtern -->
+            <div class="card-face card-back">
+                    <p>
+                    <span class="highlight-time">xx:05</span> <span class="highlight-text">... en punto</span><br>
+                    <span class="highlight-time">xx:15</span> <span class="highlight-text">... y cuarto</span><br>
+                    <span class="highlight-time">xx:30</span> <span class="highlight-text">... y media</span><br>
+                    <span class="highlight-time">xx:40</span> <span class="highlight-text">... menos veinte</span><br>
+                    <span class="highlight-time">xx:45</span> <span class="highlight-text">... menos cuarto</span><br>
+                    <span class="highlight-time">xx:55</span> <span class="highlight-text">... menos cinco</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <a href="../index.html" class="back-button">zurück</a>
+
+    <script>
+        function flipCard() {
+            const card = document.getElementById("helpCard");
+            card.classList.toggle("is-flipped");
+        }
+
+           const times = [
+    { times: ["01:00", "13:00"], spanish: "Una en punto" },
+    { times: ["01:05", "13:05"], spanish: "Una y cinco" },
+    { times: ["01:10", "13:10"], spanish: "Una y diez" },
+    { times: ["01:15", "13:15"], spanish: "Una y cuarto" },
+    { times: ["01:20", "13:20"], spanish: "Una y veinte" },
+    { times: ["01:30", "13:30"], spanish: "Una y media" },
+    { times: ["01:35", "13:35"], spanish: "Dos menos veinticinco" },
+    { times: ["01:45", "13:45"], spanish: "Dos menos cuarto" },
+    { times: ["01:50", "13:50"], spanish: "Dos menos diez" },
+    { times: ["01:55", "13:55"], spanish: "Dos menos cinco" },
+
+    { times: ["02:00", "14:00"], spanish: "Dos en punto" },
+    { times: ["02:05", "14:05"], spanish: "Dos y cinco" },
+    { times: ["02:10", "14:10"], spanish: "Dos y diez" },
+    { times: ["02:15", "14:15"], spanish: "Dos y cuarto" },
+    { times: ["02:20", "14:20"], spanish: "Dos y veinte" },
+    { times: ["02:30", "14:30"], spanish: "Dos y media" },
+    { times: ["02:35", "14:35"], spanish: "Tres menos veinticinco" },
+    { times: ["02:45", "14:45"], spanish: "Tres menos cuarto" },
+    { times: ["02:50", "14:50"], spanish: "Tres menos diez" },
+    { times: ["02:55", "14:55"], spanish: "Tres menos cinco" },
+
+    { times: ["03:00", "15:00"], spanish: "Tres en punto" },
+    { times: ["03:05", "15:05"], spanish: "Tres y cinco" },
+    { times: ["03:10", "15:10"], spanish: "Tres y diez" },
+    { times: ["03:15", "15:15"], spanish: "Tres y cuarto" },
+    { times: ["03:20", "15:20"], spanish: "Tres y veinte" },
+    { times: ["03:30", "15:30"], spanish: "Tres y media" },
+    { times: ["03:35", "15:35"], spanish: "Cuatro menos veinticinco" },
+    { times: ["03:45", "15:45"], spanish: "Cuatro menos cuarto" },
+    { times: ["03:50", "15:50"], spanish: "Cuatro menos diez" },
+    { times: ["03:55", "15:55"], spanish: "Cuatro menos cinco" },
+
+    { times: ["04:00", "16:00"], spanish: "Cuatro en punto" },
+    { times: ["04:05", "16:05"], spanish: "Cuatro y cinco" },
+    { times: ["04:10", "16:10"], spanish: "Cuatro y diez" },
+    { times: ["04:15", "16:15"], spanish: "Cuatro y cuarto" },
+    { times: ["04:20", "16:20"], spanish: "Cuatro y veinte" },
+    { times: ["04:30", "16:30"], spanish: "Cuatro y media" },
+    { times: ["04:35", "16:35"], spanish: "Cinco menos veinticinco" },
+    { times: ["04:45", "16:45"], spanish: "Cinco menos cuarto" },
+    { times: ["04:50", "16:50"], spanish: "Cinco menos diez" },
+    { times: ["04:55", "16:55"], spanish: "Cinco menos cinco" },
+
+    { times: ["05:00", "17:00"], spanish: "Cinco en punto" },
+    { times: ["05:05", "17:05"], spanish: "Cinco y cinco" },
+    { times: ["05:10", "17:10"], spanish: "Cinco y diez" },
+    { times: ["05:15", "17:15"], spanish: "Cinco y cuarto" },
+    { times: ["05:20", "17:20"], spanish: "Cinco y veinte" },
+    { times: ["05:30", "17:30"], spanish: "Cinco y media" },
+    { times: ["05:35", "17:35"], spanish: "Seis menos veinticinco" },
+    { times: ["05:45", "17:45"], spanish: "Seis menos cuarto" },
+    { times: ["05:50", "17:50"], spanish: "Seis menos diez" },
+    { times: ["05:55", "17:55"], spanish: "Seis menos cinco" },
+
+    { times: ["06:00", "18:00"], spanish: "Seis en punto" },
+    { times: ["06:05", "18:05"], spanish: "Seis y cinco" },
+    { times: ["06:10", "18:10"], spanish: "Seis y diez" },
+    { times: ["06:15", "18:15"], spanish: "Seis y cuarto" },
+    { times: ["06:20", "18:20"], spanish: "Seis y veinte" },
+    { times: ["06:30", "18:30"], spanish: "Seis y media" },
+    { times: ["06:35", "18:35"], spanish: "Siete menos veinticinco" },
+    { times: ["06:45", "18:45"], spanish: "Siete menos cuarto" },
+    { times: ["06:50", "18:50"], spanish: "Siete menos diez" },
+    { times: ["06:55", "18:55"], spanish: "Siete menos fünf" },
+
+    { times: ["07:00", "19:00"], spanish: "Siete en punto" },
+    { times: ["07:05", "19:05"], spanish: "Siete y cinco" },
+    { times: ["07:10", "19:10"], spanish: "Siete y diez" },
+    { times: ["07:15", "19:15"], spanish: "Siete y cuarto" },
+    { times: ["07:20", "19:20"], spanish: "Siete y veinte" },
+    { times: ["07:30", "19:30"], spanish: "Siete y media" },
+    { times: ["07:35", "19:35"], spanish: "Ocho menos veinticinco" },
+    { times: ["07:45", "19:45"], spanish: "Ocho menos cuarto" },
+    { times: ["07:50", "19:50"], spanish: "Ocho menos zehn" },
+    { times: ["07:55", "19:55"], spanish: "Ocho menos fünf" },
+
+    { times: ["08:00", "20:00"], spanish: "Ocho en punto" },
+    { times: ["08:05", "20:05"], spanish: "Ocho y fünf" },
+    { times: ["08:10", "20:10"], spanish: "Ocho y zehn" },
+    { times: ["08:15", "20:15"], spanish: "Ocho y cuarto" },
+    { times: ["08:20", "20:20"], spanish: "Ocho y veinte" },
+    { times: ["08:30", "20:30"], spanish: "Ocho y media" },
+    { times: ["08:35", "20:35"], spanish: "Nueve menos veinticinco" },
+    { times: ["08:45", "20:45"], spanish: "Nueve menos cuarto" },
+    { times: ["08:50", "20:50"], spanish: "Nueve menos zehn" },
+    { times: ["08:55", "20:55"], spanish: "Nueve menos fünf" },
+
+];
+
+        const feedbackMessages = ["¡Excelente!", "¡Perfecto!", "¡Muy bien hecho!", "¡Genial!", "¡Sigue así!", "¡Increíble!"];
+        let currentIndex = 0;
+        let currentHour = 0;
+        let currentMinute = 0;
+        let correctAnswers = 0;
+        let difficultyIncreased = false;
+        let countdownTimer;
+        let countdownStartTimer;
+
+        function adjustTime(type, value) {
+            if (type === 'hour') {
+                currentHour = (currentHour + value + 24) % 24; 
+            } else if (type === 'minute') {
+                currentMinute = (currentMinute + value + 60) % 60;
+            }
+            updateClock();
+        }
+
+        function updateClock() {
+            const hourString = currentHour.toString().padStart(2, '0');
+            const minuteString = currentMinute.toString().padStart(2, '0');
+            document.getElementById('clock').textContent = `${hourString}:${minuteString}`;
+        }
+
+        function checkMatch() {
+            const currentDisplay = document.getElementById('clock').textContent;
+            const currentSpanishTime = times[currentIndex];
+
+            if (currentSpanishTime.times.includes(currentDisplay)) {
+                correctAnswers++;
+                if (correctAnswers === 8 && !difficultyIncreased) {
+                    increaseDifficulty();
+                } else if (!difficultyIncreased) {
+                    currentIndex = Math.floor(Math.random() * times.length);
+                    document.getElementById("spanish-time-button").textContent = times[currentIndex].spanish;
+                }
+            } else {
+                const spanishTimeButton = document.getElementById("spanish-time-button");
+                spanishTimeButton.classList.add("error");
+                setTimeout(() => spanishTimeButton.classList.remove("error"), 300);
+            }
+        }
+
+        function increaseDifficulty() {
+            difficultyIncreased = true;
+            document.getElementById("arrows").style.display = "none"; 
+            document.getElementById("inputContainer").style.display = "flex"; 
+            document.getElementById("spanish-time-button").style.display = "none"; 
+            generateRandomTime();
+        }
+
+        function generateRandomTime() {
+            currentIndex = Math.floor(Math.random() * times.length);
+            const [randomHour, randomMinute] = times[currentIndex].times[0].split(":");
+            currentHour = parseInt(randomHour);
+            currentMinute = parseInt(randomMinute);
+            updateClock();
+
+            clearTimeout(countdownStartTimer);
+            countdownStartTimer = setTimeout(startCountdown, 30000);
+        }
+
+        function checkInput() {
+            const inputField = document.getElementById("timeInput");
+            const input = inputField.value.trim().toLowerCase();
+            const correctSpanishTime = times[currentIndex].spanish.toLowerCase();
+
+            const typoTolerance = 3;
+            const distance = calculateLevenshteinDistance(input, correctSpanishTime);
+
+            if (distance === 0) {
+                inputField.classList.add("success");
+                setTimeout(() => inputField.classList.remove("success"), 300);
+                resetCountdown();
+                inputField.value = ""; 
+                generateRandomTime(); 
+            } else if (distance <= typoTolerance) {
+                inputField.classList.add("tolerance");
+                setTimeout(() => inputField.classList.remove("tolerance"), 300);
+                resetCountdown();
+                inputField.value = ""; 
+                generateRandomTime(); 
+            } else {
+                inputField.classList.add("error");
+                setTimeout(() => inputField.classList.remove("error"), 300);
+            }
+        }
+
+        function calculateLevenshteinDistance(a, b) {
+            const matrix = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+
+            for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+            for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    if (a[i - 1] === b[j - 1]) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j - 1] + 1
+                        );
+                    }
+                }
+            }
+
+            return matrix[a.length][b.length];
+        }
+
+        function startCountdown() {
+            let timeRemaining = 10;
+            const countdownElement = document.getElementById("countdown");
+            countdownElement.style.display = "block";
+
+            countdownTimer = setInterval(() => {
+                countdownElement.textContent = `Tiempo: ${timeRemaining}`;
+                if (timeRemaining <= 5) {
+                    countdownElement.classList.add("countdown-intense");
+                }
+                if (timeRemaining <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownElement.style.display = "none";
+                    resetGame();
+                }
+                timeRemaining--;
+            }, 1000);
+        }
+
+        function resetCountdown() {
+            clearTimeout(countdownStartTimer);
+            clearInterval(countdownTimer);
+            document.getElementById("countdown").style.display = "none";
+            document.getElementById("countdown").classList.remove("countdown-intense");
+        }
+
+        function resetGame() {
+            difficultyIncreased = false;
+            correctAnswers = 0;
+            document.getElementById("arrows").style.display = "flex";
+            document.getElementById("inputContainer").style.display = "none";
+            document.getElementById("spanish-time-button").style.display = "block";
+            document.getElementById("countdown").classList.remove("countdown-intense");
+            currentIndex = Math.floor(Math.random() * times.length);
+            document.getElementById("spanish-time-button").textContent = times[currentIndex].spanish;
+        }
+
+        updateClock();
+        currentIndex = Math.floor(Math.random() * times.length);
+        document.getElementById("spanish-time-button").textContent = times[currentIndex].spanish;
+    </script>
+</body>
+</html>

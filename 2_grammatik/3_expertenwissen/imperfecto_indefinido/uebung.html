@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Indefinido vs. El Imperfecto Übungen</title>
+    <style>
+        /* Grundlegendes Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #FFFFFF;
+            color: #333;
+        }
+
+        h1 {
+            color: #000000; /* Überschrift in Schwarz */
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .dropdown {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .exercise-section {
+            background-color: #FFFFFF;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: left;
+            display: none;
+        }
+
+        .exercise-section.active {
+            display: block;
+        }
+
+        .exercise-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .exercise-item {
+            background-color: #FFFFFF;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1em;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+        }
+
+        /* Anpassung des Drop-Down-Stils und Schriftart */
+        select, input[type="text"] {
+            padding: 8px;
+            font-size: 1em;
+            font-family: Arial, sans-serif; /* Gleiche Schriftart wie der Rest der Seite */
+            border-radius: 5px;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+            background-color: #FFFFFF;
+            color: #333;
+            transition: border-color 0.3s ease;
+            appearance: none;
+        }
+
+        /* Feedback für richtig, fast richtig und falsch */
+        .correct {
+            background-color: #A7E3A7 !important; /* Grün bei korrekter Antwort */
+            border-color: #A7E3A7 !important;
+        }
+
+        .almost-correct {
+            background-color: #FFD966 !important; /* Gelb bei fast richtiger Antwort */
+            border-color: #FFD966 !important;
+        }
+
+        .incorrect {
+            animation: incorrectFeedback 0.5s;
+            border-color: #EFA7A7 !important; /* Rotes Aufleuchten der Umrandung */
+        }
+
+        /* Animationen für visuelles Feedback */
+        @keyframes incorrectFeedback {
+            0% { border-color: #C2E0C6; }
+            50% { border-color: #EFA7A7; transform: translateX(-2px); }
+            100% { border-color: #C2E0C6; transform: translateX(0); }
+        }
+
+        /* Anpassung der Zurück-Buttons */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .buttons a {
+            text-decoration: none;
+            padding: 12px 20px;
+            margin-top: 10px;
+            margin: 0 10px;
+            border-radius: 8px;
+            color: #000000; /* Schwarze Schriftfarbe */
+            background-color: #FFFFFF; /* Weißer Hintergrund */
+            font-size: 1em;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #C2E0C6; /* Pastellgrüne Umrandung */
+            transition: background-color 0.3s;
+        }
+
+        .buttons a:hover {
+            background-color: #EEEEEE;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdown = document.getElementById("difficulty-select");
+            const sections = document.querySelectorAll(".exercise-section");
+
+            dropdown.addEventListener("change", function() {
+                sections.forEach(section => {
+                    section.classList.remove("active");
+                });
+                document.getElementById(dropdown.value).classList.add("active");
+            });
+
+            document.querySelectorAll(".exercise-item select").forEach(select => {
+                // Leere Standardoption hinzufügen
+                const placeholderOption = document.createElement("option");
+                placeholderOption.value = "";
+                placeholderOption.textContent = "";
+                select.insertBefore(placeholderOption, select.firstChild);
+                select.selectedIndex = 0; // Startet mit leerer Option
+
+                select.addEventListener("change", function() {
+                    const correctAnswer = this.getAttribute("data-answer");
+                    if (this.value === correctAnswer) {
+                        this.classList.add("correct");
+                        this.disabled = true; // Antwort wird fixiert
+                    } else {
+                        this.classList.add("incorrect");
+                        setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
+                    }
+                });
+            });
+
+            document.querySelectorAll(".exercise-item input[type='text']").forEach(input => {
+                input.addEventListener("input", function() {
+                    const correctAnswer = this.getAttribute("data-answer").toLowerCase();
+                    const userAnswer = this.value.trim().toLowerCase();
+                    
+                    if (userAnswer === correctAnswer) {
+                        this.classList.add("correct");
+                        this.classList.remove("incorrect", "almost-correct");
+                        this.disabled = true; // Antwort fixieren
+                    } else if (levenshtein(userAnswer, correctAnswer) <= 2) {
+                        this.classList.add("almost-correct");
+                        this.classList.remove("correct", "incorrect");
+                    } else {
+                        this.classList.add("incorrect");
+                        this.classList.remove("correct", "almost-correct");
+                        setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
+                    }
+                });
+            });
+
+            function levenshtein(a, b) {
+                const matrix = [];
+                let i, j;
+                if (!a.length) return b.length;
+                if (!b.length) return a.length;
+
+                for (i = 0; i <= b.length; i++) {
+                    matrix[i] = [i];
+                }
+                for (j = 0; j <= a.length; j++) {
+                    matrix[0][j] = j;
+                }
+                for (i = 1; i <= b.length; i++) {
+                    for (j = 1; j <= a.length; j++) {
+                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+                        }
+                    }
+                }
+                return matrix[b.length][a.length];
+            }
+        });
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>El Indefinido vs. El Imperfecto Übungen</h1>
+
+        <!-- Dropdown zur Auswahl des Schwierigkeitsgrades -->
+        <div class="dropdown">
+            <label for="difficulty-select">Schwierigkeitsgrad wählen:</label>
+            <select id="difficulty-select">
+                <option value="einfach">Einfach</option>
+                <option value="mittel" selected>Mittel</option>
+                <option value="schwierig">Schwierig</option>
+            </select>
+        </div>
+
+        <!-- Einfache Aufgaben -->
+        <div id="einfach" class="exercise-section">
+            <h2>Einfach</h2>
+            <p>Wähle die richtige Form: Indefinido oder Imperfecto (2 Antwortmöglichkeiten):</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. Cuando era niño, yo siempre <select data-answer="jugaba">
+                    <option value=""></option>
+                    <option value="jugaba">jugaba</option>
+                    <option value="jugué">jugué</option>
+                </select> en el parque. (jugar)</li>
+                <li class="exercise-item">2. Ayer <select data-answer="fui">
+                    <option value=""></option>
+                    <option value="fui">fui</option>
+                    <option value="iba">iba</option>
+                </select> al supermercado. (ir)</li>
+                <!-- Weitere Aufgaben folgen -->
+            </ul>
+        </div>
+
+        <!-- Mittlere Aufgaben -->
+        <div id="mittel" class="exercise-section active">
+            <h2>Mittel</h2>
+            <p>Wähle die richtige Form: Indefinido oder Imperfecto (4 Antwortmöglichkeiten) und erkläre, warum:</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. Mientras mi madre <select data-answer="cocinaba">
+                    <option value=""></option>
+                    <option value="cocinaba">cocinaba</option>
+                    <option value="cocinó">cocinó</option>
+                    <option value="cocinará">cocinará</option>
+                    <option value="cocine">cocine</option>
+                </select>, yo <select data-answer="leía">
+                    <option value=""></option>
+                    <option value="leía">leía</option>
+                    <option value="leí">leí</option>
+                    <option value="leeré">leeré</option>
+                    <option value="leo">leo</option>
+                </select> un libro. (cocinar / leer)</li>
+                <!-- Weitere Aufgaben folgen -->
+            </ul>
+        </div>
+
+        <!-- Schwierige Aufgaben -->
+        <div id="schwierig" class="exercise-section">
+            <h2>Schwierig</h2>
+            <p>Setze die Verben in der richtigen Form des Indefinido oder Imperfecto ein und erkläre, warum diese Zeit verwendet wird:</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. Cuando llegué a casa, mi hermano ya <input type="text" data-answer="había salido">. (salir)</li>
+                <li class="exercise-item">2. Mientras yo <input type="text" data-answer="trabajaba"> en el jardín, empezó a llover. (trabajar)</li>
+                <!-- Weitere Aufgaben folgen -->
+            </ul>
+        </div>
+
+        <!-- Button zum Zurückkehren -->
+        <div class="buttons">
+            <a href="index.html">Zurück zur Startseite</a>
+        </div>
+    </div>
+
+</body>
+</html>

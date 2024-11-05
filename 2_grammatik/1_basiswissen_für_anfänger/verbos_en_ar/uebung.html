@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Übungen zu los verbos regulares en -ar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        h1 {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .dropdown, .settings {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .exercise-section {
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        .exercise-section.active {
+            display: block;
+        }
+        .exercise-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .exercise-item {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1em;
+            border: 1px solid #e0e0e0;
+        }
+        select, input[type="text"] {
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            width: 100%;
+            max-width: 200px;
+            background-color: #f9f9f9;
+            color: #333;
+            margin-top: 10px;
+            transition: border-color 0.3s ease;
+        }
+        select.correct, input[type="text"].correct {
+            background-color: #d4edda; /* grün für korrekt */
+            border-color: #28a745;
+        }
+        select.almost-correct, input[type="text"].almost-correct {
+            background-color: #fff3cd; /* gelb für fast korrekt */
+            border-color: #ffc107;
+        }
+        select.incorrect, input[type="text"].incorrect {
+            border-color: #dc3545; /* rot für inkorrekt */
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        .buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .buttons a {
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: #ffffff;
+            background-color: #4CAF50;
+            font-size: 1em;
+            font-weight: bold;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 0 auto;
+        }
+        .buttons a:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdown = document.getElementById("difficulty-select");
+            const sections = document.querySelectorAll(".exercise-section");
+
+            dropdown.addEventListener("change", function() {
+                sections.forEach(section => section.classList.remove("active"));
+                document.getElementById(dropdown.value).classList.add("active");
+            });
+
+            document.querySelectorAll(".exercise-item select").forEach(select => {
+                shuffleOptions(select);
+                select.addEventListener("change", function() {
+                    const correctAnswer = this.getAttribute("data-answer");
+                    this.classList.remove("correct", "almost-correct", "incorrect");
+                    if (this.value === correctAnswer) {
+                        this.classList.add("correct");
+                        this.disabled = true;
+                    } else if (this.value) {
+                        this.classList.add("incorrect");
+                        setTimeout(() => this.classList.remove("incorrect"), 500);
+                    }
+                });
+            });
+
+            document.querySelectorAll(".exercise-item input[type='text']").forEach(input => {
+                input.addEventListener("input", function() {
+                    const correctAnswer = this.getAttribute("data-answer").toLowerCase();
+                    this.classList.remove("correct", "almost-correct", "incorrect");
+                    if (this.value.toLowerCase() === correctAnswer) {
+                        this.classList.add("correct");
+                        this.disabled = true;
+                    } else if (levenshtein(this.value.toLowerCase(), correctAnswer) <= 2) {
+                        this.classList.add("almost-correct");
+                        setTimeout(() => {
+                            this.classList.remove("almost-correct");
+                            this.classList.add("correct");
+                            this.disabled = true;
+                        }, 1000);
+                    } else if (this.value) {
+                        this.classList.add("incorrect");
+                        this.style.animation = "shake 0.3s";
+                        setTimeout(() => {
+                            this.classList.remove("incorrect");
+                            this.style.animation = "";
+                        }, 500);
+                    }
+                });
+            });
+
+            function levenshtein(a, b) {
+                const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+                for (let j = 1; j <= a.length; j++) matrix[0][j] = j;
+                for (let i = 1; i <= b.length; i++) {
+                    for (let j = 1; j <= a.length; j++) {
+                        matrix[i][j] = b[i - 1] === a[j - 1]
+                            ? matrix[i - 1][j - 1]
+                            : Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
+                    }
+                }
+                return matrix[b.length][a.length];
+            }
+
+            function shuffleOptions(selectElement) {
+                const options = Array.from(selectElement.options).slice(1);
+                options.sort(() => Math.random() - 0.5);
+                options.forEach(option => selectElement.appendChild(option));
+                selectElement.selectedIndex = 0;
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Übungen zu los verbos regulares en -ar</h1>
+
+        <div class="dropdown">
+            <label for="difficulty-select">Schwierigkeitsgrad wählen:</label>
+            <select id="difficulty-select">
+                <option value="einfach">Einfach</option>
+                <option value="mittel" selected>Mittel</option>
+                <option value="schwierig">Schwierig</option>
+            </select>
+        </div>
+
+<!-- Einfache Übungen -->
+<div id="einfach" class="exercise-section">
+    <h2>Einfach</h2>
+    <p>Wähle die richtige Form des Verbs:</p>
+    <ul class="exercise-list">
+        <li class="exercise-item">1. Yo <select data-answer="hablo">
+            <option value=""></option>
+            <option value="hablo">hablo</option>
+            <option value="hablas">hablas</option>
+        </select> español. (hablar)</li>
+        <li class="exercise-item">2. Nosotros <select data-answer="cantamos">
+            <option value=""></option>
+            <option value="canto">canto</option>
+            <option value="cantamos">cantamos</option>
+        </select> en el coro. (cantar)</li>
+        <li class="exercise-item">3. Ellos <select data-answer="terminan">
+            <option value=""></option>
+            <option value="termino">termino</option>
+            <option value="terminan">terminan</option>
+        </select> la tarea. (terminar)</li>
+        <li class="exercise-item">4. Tú <select data-answer="hablas">
+            <option value=""></option>
+            <option value="hablo">hablo</option>
+            <option value="hablas">hablas</option>
+        </select> con tu amigo. (hablar)</li>
+        <li class="exercise-item">5. Ella <select data-answer="compra">
+            <option value=""></option>
+            <option value="compra">compra</option>
+            <option value="compran">compran</option>
+        </select> una camiseta. (comprar)</li>
+        <li class="exercise-item">6. Nosotros <select data-answer="necesitamos">
+            <option value=""></option>
+            <option value="necesito">necesito</option>
+            <option value="necesitamos">necesitamos</option>
+        </select> más agua. (necesitar)</li>
+        <li class="exercise-item">7. Ellos <select data-answer="pintan">
+            <option value=""></option>
+            <option value="pinto">pinto</option>
+            <option value="pintan">pintan</option>
+        </select> la casa. (pintar)</li>
+        <li class="exercise-item">8. Vosotros <select data-answer="trabajáis">
+            <option value=""></option>
+            <option value="trabajamos">trabajamos</option>
+            <option value="trabajáis">trabajáis</option>
+        </select> en el jardín. (trabajar)</li>
+        <li class="exercise-item">9. Yo <select data-answer="escucho">
+            <option value=""></option>
+            <option value="escucho">escucho</option>
+            <option value="escucha">escucha</option>
+        </select> música. (escuchar)</li>
+        <li class="exercise-item">10. Ellas <select data-answer="visitan">
+            <option value=""></option>
+            <option value="visito">visito</option>
+            <option value="visitan">visitan</option>
+        </select> a sus abuelos. (visitar)</li>
+    </ul>
+</div>
+
+<!-- Mittlere Übungen -->
+<div id="mittel" class="exercise-section active">
+    <h2>Mittel</h2>
+    <p>Setze die richtige Verbform ein:</p>
+    <ul class="exercise-list">
+        <li class="exercise-item">1. Él <select data-answer="trabaja">
+            <option value=""></option>
+            <option value="trabajo">trabajo</option>
+            <option value="trabaja">trabaja</option>
+        </select> en una oficina. (trabajar)</li>
+        <li class="exercise-item">2. Vosotros <select data-answer="bailáis">
+            <option value=""></option>
+            <option value="bailamos">bailamos</option>
+            <option value="bailáis">bailáis</option>
+        </select> muy bien. (bailar)</li>
+        <li class="exercise-item">3. Nosotros <select data-answer="tomamos">
+            <option value=""></option>
+            <option value="tomo">tomo</option>
+            <option value="tomamos">tomamos</option>
+        </select> un descanso. (tomar)</li>
+        <li class="exercise-item">4. Ellas <select data-answer="escuchan">
+            <option value=""></option>
+            <option value="escuchas">escuchas</option>
+            <option value="escuchan">escuchan</option>
+        </select> la radio. (escuchar)</li>
+        <li class="exercise-item">5. Tú <select data-answer="limpias">
+            <option value=""></option>
+            <option value="limpio">limpio</option>
+            <option value="limpias">limpias</option>
+        </select> la habitación. (limpiar)</li>
+        <li class="exercise-item">6. Ellos <select data-answer="cantan">
+            <option value=""></option>
+            <option value="canto">canto</option>
+            <option value="cantan">cantan</option>
+        </select> una canción. (cantar)</li>
+        <li class="exercise-item">7. Nosotros <select data-answer="visitamos">
+            <option value=""></option>
+            <option value="visito">visito</option>
+            <option value="visitamos">visitamos</option>
+        </select> a nuestros amigos. (visitar)</li>
+        <li class="exercise-item">8. Yo <select data-answer="camino">
+            <option value=""></option>
+            <option value="camino">camino</option>
+            <option value="camina">camina</option>
+        </select> al parque. (caminar)</li>
+        <li class="exercise-item">9. Ella <select data-answer="necesita">
+            <option value=""></option>
+            <option value="necesito">necesito</option>
+            <option value="necesita">necesita</option>
+        </select> agua. (necesitar)</li>
+        <li class="exercise-item">10. Vosotros <select data-answer="estudiáis">
+            <option value=""></option>
+            <option value="estudio">estudio</option>
+            <option value="estudiáis">estudiáis</option>
+        </select> para el examen. (estudiar)</li>
+    </ul>
+</div>
+
+<!-- Schwierige Übungen -->
+<div id="schwierig" class="exercise-section">
+    <h2>Schwierig</h2>
+    <p>Setze das passende Verb in der richtigen Form ein:</p>
+    <ul class="exercise-list">
+        <li class="exercise-item">1. Ellos <input type="text" data-answer="escuchan"> música todos los días. (escuchar)</li>
+        <li class="exercise-item">2. Nosotros <input type="text" data-answer="necesitamos"> ayuda para el proyecto. (necesitar)</li>
+        <li class="exercise-item">3. Tú <input type="text" data-answer="preparas"> la cena para la familia. (preparar)</li>
+        <li class="exercise-item">4. Ella <input type="text" data-answer="limpia"> la cocina después de comer. (limpiar)</li>
+        <li class="exercise-item">5. Nosotros <input type="text" data-answer="visitamos"> a nuestros abuelos el domingo. (visitar)</li>
+        <li class="exercise-item">6. Ellos <input type="text" data-answer="trabajan"> en una empresa grande. (trabajar)</li>
+        <li class="exercise-item">7. Yo <input type="text" data-answer="pinto"> un cuadro para mi madre. (pintar)</li>
+        <li class="exercise-item">8. Vosotros <input type="text" data-answer="lleváis"> los libros a clase. (llevar)</li>
+        <li class="exercise-item">9. Ella <input type="text" data-answer="baila"> en la fiesta con sus amigos. (bailar)</li>
+        <li class="exercise-item">10. Nosotros <input type="text" data-answer="estudiamos"> español todos los días. (estudiar)</li>
+    </ul>
+</div>
+
+
+        <div class="buttons">
+            <a href="index.html">zurück</a>
+        </div>
+    </div>
+</body>
+</html>

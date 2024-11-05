@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Momento final: Unidad 3</title>
+    <style>
+        /* Minimalistisches Design mit sanften Pastelltönen */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f3f4f6;
+            color: #2b2b2b;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            background: linear-gradient(135deg, #82c8a0, #b3a4b9);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8em;
+            border-radius: 10px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+            max-width: 600px;
+        }
+
+        /* Fortschrittsbalken Styling */
+        #progress-bar-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #e0e0e0;
+            height: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #82c8a0;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .question {
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            width: 100%;
+            margin: 30px 0;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            color: #4b4e6d;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 1.2rem;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #d3b4e4;
+            border-radius: 8px;
+            margin-top: 10px;
+            background-color: #ffffff;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Animation für korrektes Aufleuchten */
+        @keyframes correct-flash {
+            0% { background-color: #ffffff; }
+            50% { background-color: #9ddfbe; }
+            100% { background-color: #ffffff; }
+        }
+
+        /* Animation für fast richtige Antwort (gelb) */
+        @keyframes close-enough-flash {
+            0% { background-color: #ffffff; }
+            50% { background-color: #f8e7a4; }
+            100% { background-color: #ffffff; }
+        }
+
+        /* Animation für falsche Antwort (rot) */
+        @keyframes incorrect-flash {
+            0% { background-color: #ffffff; }
+            50% { background-color: #f8d7da; }
+            100% { background-color: #ffffff; }
+        }
+
+        /* Feedback Farben mit Animationen */
+        .correct {
+            animation: correct-flash 0.5s ease-in-out;
+            border-color: #9ddfbe;
+        }
+
+        .close-enough {
+            animation: close-enough-flash 0.5s ease-in-out;
+            border-color: #f8e7a4;
+        }
+
+        .incorrect {
+            animation: incorrect-flash 0.5s ease-in-out;
+            border-color: #f8d7da;
+        }
+
+        /* Multiple-Choice-Antworten in zentrierten, hellgrünen Boxen */
+        label.option {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: calc(100% - 20px);
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 1.1rem;
+            background-color: #e6f4ea; /* Helles Pastellgrün */
+            color: #2b2b2b;
+            border: 1px solid #b3e0c4;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.2s;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Eingabefelder für Radio-Buttons ausblenden */
+        label.option input[type="radio"] {
+            display: none;
+        }
+
+        /* Hover- und Auswahlzustand */
+        label.option:hover {
+            background-color: #d0ead6;
+        }
+
+        input[type="radio"]:checked + label.option {
+            background-color: #a8d5ba;
+            color: white;
+        }
+
+        /* Feedback für korrekte und inkorrekte Antworten */
+        label.option.correct {
+            background-color: #9ddfbe;
+            color: white;
+        }
+
+        label.option.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .hint-message {
+            font-size: 1.1rem;
+            color: #721c24;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #end-message {
+            display: none;
+            text-align: center;
+            font-size: 1.5rem;
+            color: #4b4e6d;
+            margin-top: 20px;
+        }
+
+        /* Button Styling */
+        #restart-button, #submit-button, #back-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #a8d5ba;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.2s;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        #restart-button {
+            background-color: #82c8a0;
+        }
+
+        #back-button {
+            background-color: #4b4e6d;
+        }
+
+        #restart-button:hover, #submit-button:hover, #back-button:hover {
+            background-color: #7ab593;
+            transform: translateY(-3px);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            input[type="text"], #submit-button, #restart-button, #back-button {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Momento final Unidad 3</h1>
+    </header>
+    
+    <div id="quiz-section">
+        <div id="question-container" class="question"></div>
+    </div>
+
+    <div id="hint-message" class="hint-message">richtige Antwort: <span id="correct-answer"></span>.</div>
+
+    <div id="end-message"></div>
+<!-- Quiz-Neustart-Button mit anfänglicher Ausblendung -->
+<button id="restart-button" onclick="restartQuiz()" style="display: none;">Quiz neu starten</button>
+
+<!-- Fortschrittsbalken unter dem Quiz -->
+<div id="progress-bar-container">
+    <div id="progress-bar"></div>
+</div>
+
+<!-- Zurück-Button am Ende der Seite -->
+<a href="../index.html" id="back-button">Zurück</a>
+
+
+    <script>
+        let currentQuestionIndex = 0;
+        let attemptCount = 0;
+        let currentInput = null;
+
+   const deutschSpanischFragenPool = [
+    { question: "Übersetze: 'die U-Bahn'", answer: "el metro" },
+    { question: "Übersetze: 'das Kino'", answer: "el cine" },
+    { question: "Übersetze: 'die Bibliothek'", answer: "la biblioteca" },
+    { question: "Übersetze: 'die Bäckerei'", answer: "la panadería" },
+    { question: "Übersetze: 'das Einkaufszentrum'", answer: "el centro comercial" },
+    { question: "Übersetze: 'der Park'", answer: "el parque" },
+    { question: "Übersetze: 'das Restaurant'", answer: "el restaurante" },
+    { question: "Übersetze: 'die Wohnung'", answer: "el piso" },
+    { question: "Übersetze: 'das Zimmer'", answer: "la habitación" },
+    { question: "Übersetze: 'das Badezimmer'", answer: "el baño" },
+    { question: "Übersetze: 'die Küche'", answer: "la cocina" },
+    { question: "Übersetze: 'das Wohnzimmer'", answer: "el salón" },
+    { question: "Übersetze: 'das Stadtviertel'", answer: "el barrio" },
+    { question: "Übersetze: 'das Museum'", answer: "el museo" },
+    { question: "Übersetze: 'die Apotheke'", answer: "la farmacia" },
+    { question: "Übersetze: 'der Balkon'", answer: "el balcón" },
+    { question: "Übersetze: 'das Schlafzimmer'", answer: "el dormitorio" },
+    { question: "Übersetze: 'die Nachbarin'", answer: "la vecina" },
+    { question: "Übersetze: 'schön'", answer: "bonito, -a" },
+    { question: "Übersetze: 'klein'", answer: "pequeño, -a" },
+    { question: "Übersetze: 'groß'", answer: "grande" },
+    { question: "Übersetze: 'in der Nähe von'", answer: "cerca de" },
+    { question: "Übersetze: 'neben'", answer: "al lado de" },
+    { question: "Übersetze: 'wohnen'", answer: "vivir" },
+    { question: "Übersetze: 'das Bett'", answer: "la cama" },
+    { question: "Übersetze: 'der Tisch'", answer: "la mesa" },
+    { question: "Übersetze: 'der Schrank'", answer: "el armario" },
+    { question: "Übersetze: 'die Tür'", answer: "la puerta" },
+    { question: "Übersetze: 'das Geräusch'", answer: "el ruido" },
+    { question: "Übersetze: 'hören'", answer: "escuchar" }
+];
+
+const spanischDeutschFragenPool = [
+    { question: "Übersetze 'el metro' ins Deutsche", answer: "die U-Bahn" },
+    { question: "Übersetze 'el cine' ins Deutsche", answer: "das Kino" },
+    { question: "Übersetze 'la biblioteca' ins Deutsche", answer: "die Bibliothek" },
+    { question: "Übersetze 'la panadería' ins Deutsche", answer: "die Bäckerei" },
+    { question: "Übersetze 'el centro comercial' ins Deutsche", answer: "das Einkaufszentrum" },
+    { question: "Übersetze 'el parque' ins Deutsche", answer: "der Park" },
+    { question: "Übersetze 'el restaurante' ins Deutsche", answer: "das Restaurant" },
+    { question: "Übersetze 'el piso' ins Deutsche", answer: "die Wohnung" },
+    { question: "Übersetze 'la habitación' ins Deutsche", answer: "das Zimmer" },
+    { question: "Übersetze 'el baño' ins Deutsche", answer: "das Badezimmer" },
+    { question: "Übersetze 'la cocina' ins Deutsche", answer: "die Küche" },
+    { question: "Übersetze 'el salón' ins Deutsche", answer: "das Wohnzimmer" },
+    { question: "Übersetze 'el barrio' ins Deutsche", answer: "das Stadtviertel" },
+    { question: "Übersetze 'el museo' ins Deutsche", answer: "das Museum" },
+    { question: "Übersetze 'la farmacia' ins Deutsche", answer: "die Apotheke" },
+    { question: "Übersetze 'el balcón' ins Deutsche", answer: "der Balkon" },
+    { question: "Übersetze 'el dormitorio' ins Deutsche", answer: "das Schlafzimmer" },
+    { question: "Übersetze 'la vecina' ins Deutsche", answer: "die Nachbarin" },
+    { question: "Übersetze 'bonito, -a' ins Deutsche", answer: "schön" },
+    { question: "Übersetze 'pequeño, -a' ins Deutsche", answer: "klein" },
+    { question: "Übersetze 'grande' ins Deutsche", answer: "groß" },
+    { question: "Übersetze 'cerca de' ins Deutsche", answer: "in der Nähe von" },
+    { question: "Übersetze 'al lado de' ins Deutsche", answer: "neben" },
+    { question: "Übersetze 'vivir' ins Deutsche", answer: "wohnen" },
+    { question: "Übersetze 'la cama' ins Deutsche", answer: "das Bett" },
+    { question: "Übersetze 'la mesa' ins Deutsche", answer: "der Tisch" },
+    { question: "Übersetze 'el armario' ins Deutsche", answer: "der Schrank" },
+    { question: "Übersetze 'la puerta' ins Deutsche", answer: "die Tür" },
+    { question: "Übersetze 'el ruido' ins Deutsche", answer: "das Geräusch" },
+    { question: "Übersetze 'escuchar' ins Deutsche", answer: "hören" }
+];
+
+
+const multipleChoiceFragenPool = [
+    { question: "Was bedeutet 'el metro' auf Deutsch?", options: ["die U-Bahn", "die Bibliothek", "das Kino", "das Haus"], answer: "die U-Bahn" },
+    { question: "Was bedeutet 'el cine' auf Deutsch?", options: ["das Kino", "die U-Bahn", "das Einkaufszentrum", "die Küche"], answer: "das Kino" },
+    { question: "Was bedeutet 'la biblioteca' auf Deutsch?", options: ["die Bibliothek", "das Zimmer", "das Kino", "die Apotheke"], answer: "die Bibliothek" },
+    { question: "Was bedeutet 'la panadería' auf Deutsch?", options: ["die Bäckerei", "das Restaurant", "die Apotheke", "der Park"], answer: "die Bäckerei" },
+    { question: "Was bedeutet 'el centro comercial' auf Deutsch?", options: ["das Einkaufszentrum", "das Restaurant", "die Stadt", "die U-Bahn"], answer: "das Einkaufszentrum" },
+    { question: "Was bedeutet 'el parque' auf Deutsch?", options: ["der Park", "die Küche", "das Kino", "die Apotheke"], answer: "der Park" },
+    { question: "Was bedeutet 'el restaurante' auf Deutsch?", options: ["das Restaurant", "die Apotheke", "die Stadt", "die Bibliothek"], answer: "das Restaurant" },
+    { question: "Was bedeutet 'el piso' auf Deutsch?", options: ["die Wohnung", "das Badezimmer", "das Restaurant", "der Park"], answer: "die Wohnung" },
+    { question: "Was bedeutet 'la habitación' auf Deutsch?", options: ["das Zimmer", "das Schlafzimmer", "das Kino", "die Apotheke"], answer: "das Zimmer" },
+    { question: "Was bedeutet 'el baño' auf Deutsch?", options: ["das Badezimmer", "das Wohnzimmer", "die Bibliothek", "die Apotheke"], answer: "das Badezimmer" },
+    { question: "Was bedeutet 'la cocina' auf Deutsch?", options: ["die Küche", "das Restaurant", "das Kino", "das Einkaufszentrum"], answer: "die Küche" },
+    { question: "Was bedeutet 'el salón' auf Deutsch?", options: ["das Wohnzimmer", "das Kino", "die Stadt", "das Schlafzimmer"], answer: "das Wohnzimmer" },
+    { question: "Was bedeutet 'el barrio' auf Deutsch?", options: ["das Stadtviertel", "die Stadt", "das Zimmer", "das Kino"], answer: "das Stadtviertel" },
+    { question: "Was bedeutet 'el museo' auf Deutsch?", options: ["das Museum", "das Kino", "die Bibliothek", "der Park"], answer: "das Museum" },
+    { question: "Was bedeutet 'la farmacia' auf Deutsch?", options: ["die Apotheke", "die Bibliothek", "die Stadt", "der Park"], answer: "die Apotheke" },
+    { question: "Was bedeutet 'el balcón' auf Deutsch?", options: ["der Balkon", "das Restaurant", "das Kino", "die Apotheke"], answer: "der Balkon" },
+    { question: "Was bedeutet 'el dormitorio' auf Deutsch?", options: ["das Schlafzimmer", "das Wohnzimmer", "das Kino", "die Bibliothek"], answer: "das Schlafzimmer" },
+    { question: "Was bedeutet 'la vecina' auf Deutsch?", options: ["die Nachbarin", "die Freundin", "die Schwester", "die Nachbarin"], answer: "die Nachbarin" },
+    { question: "Was bedeutet 'bonito, -a' auf Deutsch?", options: ["schön", "klein", "groß", "in der Nähe von"], answer: "schön" },
+    { question: "Was bedeutet 'pequeño, -a' auf Deutsch?", options: ["klein", "groß", "schön", "neben"], answer: "klein" }
+];
+
+
+        function getRandomQuestions(pool, num) {
+            const shuffled = [...pool];
+            shuffleArray(shuffled);
+            return shuffled.slice(0, num);
+        }
+
+        const deutschSpanischFragen = getRandomQuestions(deutschSpanischFragenPool, 6);
+        const spanischDeutschFragen = getRandomQuestions(spanischDeutschFragenPool, 6);
+        const multipleChoiceFragen = getRandomQuestions(multipleChoiceFragenPool, 6);
+
+        const allQuestions = [...deutschSpanischFragen, ...spanischDeutschFragen, ...multipleChoiceFragen];
+        shuffleArray(allQuestions);
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function checkAnswerWithTolerance(correctAnswer, userAnswer, tolerance = 2) {
+            return levenshtein(correctAnswer.toLowerCase(), userAnswer.toLowerCase()) <= tolerance;
+        }
+
+        function levenshtein(a, b) {
+            const matrix = Array.from({ length: a.length + 1 }, (_, i) =>
+                Array.from({ length: b.length + 1 }, (_, j) => (j === 0 ? i : j === 0 ? j : 0))
+            );
+
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    if (a[i - 1] === b[j - 1]) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j - 1] + 1
+                        );
+                    }
+                }
+            }
+
+            return matrix[a.length][b.length];
+        }
+
+        function checkAnswer(correctAnswer, answerInput) {
+            answerInput.classList.remove("correct", "incorrect", "close-enough");
+            if (checkAnswerWithTolerance(correctAnswer, answerInput.value, 2)) {
+                if (answerInput.value.toLowerCase() === correctAnswer.toLowerCase()) {
+                    answerInput.classList.add("correct");
+                } else {
+                    answerInput.classList.add("close-enough");
+                }
+                setTimeout(nextQuestion, 1000);
+            } else {
+                attemptCount++;
+                answerInput.classList.add("incorrect");
+                setTimeout(() => answerInput.classList.remove("incorrect"), 500);
+                if (attemptCount >= 3) {
+                    showHint(correctAnswer);
+                    attemptCount = 0;
+                }
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / allQuestions.length) * 100;
+            document.getElementById("progress-bar").style.width = `${progress}%`;
+        }
+
+        function displayQuestion() {
+            const questionContainer = document.getElementById("question-container");
+            questionContainer.innerHTML = '';
+            document.getElementById("hint-message").style.display = "none";
+
+            const currentQuestion = allQuestions[currentQuestionIndex];
+
+            const questionText = document.createElement("p");
+            questionText.textContent = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
+            questionContainer.appendChild(questionText);
+
+            if (currentQuestion.options) {
+                shuffleArray(currentQuestion.options);
+                currentQuestion.options.forEach(option => {
+                    const optionLabel = document.createElement("label");
+                    optionLabel.classList.add("option"); // Fügt die Klasse "option" hinzu
+                    const optionInput = document.createElement("input");
+                    optionInput.type = "radio";
+                    optionInput.name = "option";
+                    optionInput.value = option;
+                    optionInput.onclick = () => checkMCQ(currentQuestion.answer, option, optionLabel);
+
+                    optionLabel.appendChild(optionInput);
+                    optionLabel.append(option); // Entfernt das Leerzeichen vor dem Text
+                    questionContainer.appendChild(optionLabel);
+                    questionContainer.appendChild(document.createElement("br"));
+                });
+            } else {
+                currentInput = document.createElement("input");
+                currentInput.type = "text";
+                questionContainer.appendChild(currentInput);
+
+                const submitButton = document.createElement("button");
+                submitButton.id = "submit-button";
+                submitButton.textContent = "Bestätigen";
+                submitButton.style.display = "inline-block";
+                submitButton.onclick = () => checkAnswer(currentQuestion.answer, currentInput);
+                questionContainer.appendChild(submitButton);
+
+                currentInput.addEventListener("input", toggleSubmitButton);
+                toggleSubmitButton();
+            }
+
+            attemptCount = 0;
+        }
+
+        function toggleSubmitButton() {
+            const submitButton = document.getElementById("submit-button");
+            submitButton.disabled = !currentInput.value.trim();
+        }
+
+        function checkMCQ(correctAnswer, userAnswer, optionLabel) {
+            optionLabel.classList.remove("correct", "incorrect");
+            if (userAnswer === correctAnswer) {
+                optionLabel.classList.add("correct");
+                setTimeout(nextQuestion, 1000);
+            } else {
+                attemptCount++;
+                optionLabel.classList.add("incorrect");
+                setTimeout(() => optionLabel.classList.remove("incorrect"), 500);
+                if (attemptCount >= 3) {
+                    showHint(correctAnswer);
+                }
+            }
+        }
+
+        function showHint(correctAnswer) {
+            document.getElementById("correct-answer").textContent = correctAnswer;
+            document.getElementById("hint-message").style.display = "block";
+            setTimeout(nextQuestion, 2000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < allQuestions.length) {
+                updateProgressBar();
+                displayQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+     function endQuiz() {
+    const questionContainer = document.getElementById("question-container");
+    questionContainer.style.display = "none";
+    const endMessage = document.getElementById("end-message");
+    endMessage.textContent = "Du hast das Quiz abgeschlossen. Wie schätzt du deinen Lernfortschritt ein?";
+    endMessage.style.display = "block";
+    document.getElementById("restart-button").style.display = "inline-block"; // Zeigt den Button an
+}
+
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            document.getElementById("question-container").style.display = "flex";
+            updateProgressBar();
+            document.getElementById("end-message").style.display = "none";
+            document.getElementById("restart-button").style.display = "none";
+            displayQuestion();
+        }
+
+        displayQuestion();
+        updateProgressBar();
+    </script>
+</body>
+</html>

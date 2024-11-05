@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unidad 6 - Seite 203 links</title>
+    <style>
+        /* Grundlayout und Farben */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f3f4f6; /* Leichtes, neutrales Hintergrundgrau */
+            color: #2b2b2b; /* Dunkles Anthrazit für Text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Container-Stil */
+        .container {
+            max-width: 500px;
+            width: 90%;
+            padding: 30px;
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid #B3D8A5;
+            margin-top: 20px;
+        }
+
+        /* Überschrift Styling */
+        h1 {
+            color: #2b2b2b;
+            font-size: 2em;
+            margin-bottom: 25px;
+            font-weight: bold; /* Überschrift fett */
+        }
+
+        /* Einheitliches Styling für Übungslinks und Zurück-Button */
+        .exercise-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .exercise-list a, #back-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background-color: #FFFFFF; /* Weißer Hintergrund identisch wie bei anderen Boxen */
+            color: #000000;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            border: 1px solid #B3D8A5; /* Gleicher Rahmen wie Container */
+        }
+
+        .exercise-list a:hover, #back-button:hover {
+            background-color: #E9F7E0; /* Helles Pastellgrün beim Hover, konsistent mit anderen Boxen */
+            transform: translateY(-3px); /* Leichter Hüheneffekt beim Hover */
+        }
+
+        #back-button {
+            margin: 20px auto;
+            border: none;
+            outline: none;
+        }
+
+        /* Footer Styling */
+        .footer {
+            margin-top: auto;
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #666666;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .footer:hover {
+            opacity: 1;
+        }
+
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em; /* Kleinere Schriftgröße für die Überschrift */
+            }
+            .exercise-list {
+                grid-template-columns: 1fr; /* Einspaltig auf schmalen Bildschirmen */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Unidad 6 - Seite 203 links</h1>
+        
+        <main>
+            <ul class="exercise-list">
+                <li><a href="memory.html">Memory</a></li>
+                <li><a href="multiple_choice.html">Multiple Choice</a></li>
+                <li><a href="karteikarten.html">Karteikarten</a></li>
+            </ul>
+        </main>
+
+        <!-- Zurück zum übergeordneten Menü Button -->
+        <button id="back-button" onclick="window.location.href='../index.html';">zurück</button>
+    </div>
+
+    <!-- Footer mit Links zu Impressum und Datenschutz -->
+    <footer class="footer">
+        <p>Erstellt aus Liebe zur Sprache</p>
+        <a href="datenschutz.html">Datenschutz</a>
+        <a href="impressum.html">Impressum</a>
+    </footer>
+</body>
+</html>

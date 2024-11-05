@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digitale Uhr mit spanischer Uhrzeit</title>
+    <style>
+        /* Basis-Stile */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f9f9f9;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* Überschrift */
+        h1 {
+            font-size: 5vw;
+            color: #101010;
+            margin: 0 0 15px;
+            text-align: center;
+        }
+
+        /* Uhr-Container */
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #b4e4d0;
+            border-radius: 20px;
+            padding: 15px;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Uhr-Stile */
+        .clock {
+            color: red;
+            font-size: 8vw;
+            font-weight: bold;
+            background-color: black;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        /* Input und Schaltflächen */
+        .input-container,
+        .arrow-container,
+        .spanish-time-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .time-input,
+        .arrow-button,
+        .spanish-time-button,
+        .ok-button {
+            font-size: 4vw;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .time-input {
+            font-size: 2vw;
+            width: 100%;
+            max-width: 200px;
+            border: 2px solid #b4e4d0;
+        }
+
+        /* Fehler- und Positiv-Animation */
+        .error {
+            animation: shake 0.3s ease, flash-red 0.3s ease;
+        }
+
+        .success {
+            animation: flash-green 0.3s ease;
+        }
+
+        .tolerance {
+            animation: flash-yellow 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes flash-red {
+            0%, 100% { border-color: #b4e4d0; background-color: inherit; }
+            50% { border-color: red; background-color: #ffd6d6; }
+        }
+
+        @keyframes flash-green {
+            0%, 100% { border-color: #b4e4d0; background-color: inherit; }
+            50% { border-color: green; background-color: #d6ffd6; }
+        }
+
+        @keyframes flash-yellow {
+            0%, 100% { border-color: #b4e4d0; background-color: inherit; }
+            50% { border-color: yellow; background-color: #ffffd6; }
+        }
+
+        .arrow-button {
+            background-color: #d9c7f5;
+            border: none;
+        }
+
+        .arrow-button:hover,
+        .spanish-time-button:hover,
+        .ok-button:hover {
+            background-color: #b4a0e8;
+        }
+
+        /* Rückgabe-Button */
+        .back-button {
+            position: fixed;
+            bottom: 15px;
+            background-color: #d9c7f5;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 5vw;
+            border: none;
+            cursor: pointer;
+            color: #101010;
+            text-decoration: none;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            max-width: 150px;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background-color: #b4a0e8;
+        }
+
+        /* Message und Feedback */
+        .message, .feedback {
+            display: none;
+            font-size: 6vw;
+            font-weight: bold;
+            color: #27d67b;
+            background-color: #101010;
+            padding: 10px;
+            border-radius: 15px;
+            text-align: center;
+            position: absolute;
+            top: calc(100% + 10px); /* Abstand unterhalb des Uhrencontainers */
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+        }
+
+        /* Countdown */
+        .countdown {
+            display: none;
+            font-size: 7vw;
+            font-weight: bold;
+            color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>¿Qué hora es?</h1>
+
+    <div class="clock-container">
+        <div id="clock" class="clock">00:00</div>
+
+        <div class="arrow-container" id="arrows">
+            <div>
+                <button class="arrow-button" onclick="adjustTime('hour', 1)">▲</button>
+                <button class="arrow-button" onclick="adjustTime('hour', -1)">▼</button>
+            </div>
+            <div>
+                <button class="arrow-button" onclick="adjustTime('minute', 5)">▲</button>
+                <button class="arrow-button" onclick="adjustTime('minute', -5)">▼</button>
+            </div>
+        </div>
+
+        <div class="input-container" id="inputContainer" style="display: none;">
+            <input type="text" id="timeInput" class="time-input" placeholder="¿Qué hora es?">
+            <button class="ok-button" onclick="checkInput()">OK</button>
+            <span id="checkmark" class="checkmark"✔️</span>
+        </div>
+
+        <button id="spanish-time-button" class="spanish-time-button" onclick="checkMatch()">Ocho y media</button>
+
+        <div id="countdown" class="countdown">Tiempo: 10</div>
+        <div id="message" class="message">¡Muy bien!</div>
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+
+    <a href="../index.html" class="back-button">zurück</a>
+
+    <script>
+        const times = [
+            { times: ["08:30", "20:30"], spanish: "Ocho y media" },
+            { times: ["08:20", "20:20"], spanish: "Ocho y veinte" },
+
+
+        ];
+
+        const feedbackMessages = ["¡Excelente!", "¡Perfecto!", "¡Muy bien hecho!", "¡Genial!", "¡Sigue así!", "¡Increíble!"];
+        let currentIndex = 0;
+        let currentHour = 0;
+        let currentMinute = 0;
+        let correctAnswers = 0;
+        let difficultyIncreased = false;
+        let countdownTimer;
+        let countdownStartTimer;
+
+        function adjustTime(type, value) {
+            if (type === 'hour') {
+                currentHour = (currentHour + value + 24) % 24; 
+            } else if (type === 'minute') {
+                currentMinute = (currentMinute + value + 60) % 60;
+            }
+            updateClock();
+        }
+
+        function updateClock() {
+            const hourString = currentHour.toString().padStart(2, '0');
+            const minuteString = currentMinute.toString().padStart(2, '0');
+            document.getElementById('clock').textContent = `${hourString}:${minuteString}`;
+        }
+
+        function checkMatch() {
+            const currentDisplay = document.getElementById('clock').textContent;
+            const currentSpanishTime = times[currentIndex];
+
+            if (currentSpanishTime.times.includes(currentDisplay)) {
+                correctAnswers++;
+                if (correctAnswers < 8) {
+                    displayMessage("message");
+                }
+
+                if (correctAnswers === 8 && !difficultyIncreased) {
+                    increaseDifficulty();
+                } else if (!difficultyIncreased) {
+                    currentIndex = Math.floor(Math.random() * times.length);
+                    document.getElementById("spanish-time-button").textContent = times[currentIndex].spanish;
+                }
+            } else {
+                const spanishTimeButton = document.getElementById("spanish-time-button");
+                spanishTimeButton.classList.add("error");
+                setTimeout(() => spanishTimeButton.classList.remove("error"), 300);
+            }
+        }
+
+        function increaseDifficulty() {
+            difficultyIncreased = true;
+            document.getElementById("arrows").style.display = "none"; 
+            document.getElementById("inputContainer").style.display = "flex"; 
+            document.getElementById("spanish-time-button").style.display = "none"; 
+            generateRandomTime();
+        }
+
+        function generateRandomTime() {
+            currentIndex = Math.floor(Math.random() * times.length);
+            const [randomHour, randomMinute] = times[currentIndex].times[0].split(":");
+            currentHour = parseInt(randomHour);
+            currentMinute = parseInt(randomMinute);
+            updateClock();
+
+            clearTimeout(countdownStartTimer);
+            countdownStartTimer = setTimeout(startCountdown, 30000);
+        }
+
+        function checkInput() {
+            const inputField = document.getElementById("timeInput");
+            const input = inputField.value.trim().toLowerCase();
+            const correctSpanishTime = times[currentIndex].spanish.toLowerCase();
+
+            const typoTolerance = 3;
+            const distance = calculateLevenshteinDistance(input, correctSpanishTime);
+
+            if (distance === 0) {
+                inputField.classList.add("success");
+                setTimeout(() => inputField.classList.remove("success"), 300);
+                showFeedback();
+                resetCountdown();
+                inputField.value = ""; 
+                generateRandomTime(); 
+            } else if (distance <= typoTolerance) {
+                inputField.classList.add("tolerance");
+                setTimeout(() => inputField.classList.remove("tolerance"), 300);
+                showFeedback();
+                resetCountdown();
+                inputField.value = ""; 
+                generateRandomTime(); 
+            } else {
+                inputField.classList.add("error");
+                setTimeout(() => inputField.classList.remove("error"), 300);
+            }
+        }
+
+        function calculateLevenshteinDistance(a, b) {
+            const matrix = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+
+            for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+            for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    if (a[i - 1] === b[j - 1]) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j - 1] + 1
+                        );
+                    }
+                }
+            }
+
+            return matrix[a.length][b.length];
+        }
+
+        function showFeedback() {
+            const feedback = feedbackMessages[Math.floor(Math.random() * feedbackMessages.length)];
+            const feedbackElement = document.getElementById("feedback");
+            feedbackElement.textContent = feedback;
+            feedbackElement.style.display = "block";
+            setTimeout(() => feedbackElement.style.display = "none", 2000);
+        }
+
+        function startCountdown() {
+            let timeRemaining = 10;
+            const countdownElement = document.getElementById("countdown");
+            countdownElement.style.display = "block";
+
+            countdownTimer = setInterval(() => {
+                countdownElement.textContent = `Tiempo: ${timeRemaining}`;
+                if (timeRemaining <= 5) {
+                    countdownElement.classList.add("countdown-intense");
+                }
+                if (timeRemaining <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownElement.style.display = "none";
+                    resetGame();
+                }
+                timeRemaining--;
+            }, 1000);
+        }
+
+        function resetCountdown() {
+            clearTimeout(countdownStartTimer);
+            clearInterval(countdownTimer);
+            document.getElementById("countdown").style.display = "none";
+            document.getElementById("countdown").classList.remove("countdown-intense");
+        }
+
+        function resetGame() {
+            difficultyIncreased = false;
+            correctAnswers = 0;
+            document.getElementById("arrows").style.display = "flex";
+            document.getElementById("inputContainer").style.display = "none";
+            document.getElementById("spanish-time-button").style.display = "block";
+            document.getElementById("countdown").classList.remove("countdown-intense");
+            currentIndex = Math.floor(Math.random() * times.length);
+            document.getElementById("spanish-time-button").textContent = times[currentIndex].spanish;
+        }
+
+        function displayMessage(id) {
+            const messageElement = document.getElementById(id);
+            messageElement.style.display = "block";
+            setTimeout(() => {
+                messageElement.style.display = "none";
+            }, 2000);
+        }
+
+        updateClock();
+        currentIndex = Math.floor(Math.random() * times.length);
+        document.getElementById("spanish-time-button").textContent = times[currentIndex].spanish;
+    </script>
+</body>
+</html>

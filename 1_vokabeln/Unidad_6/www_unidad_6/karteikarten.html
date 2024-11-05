@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vokabeltrainer: Deutsch - Spanisch</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&display=swap');
+
+        /* Grundstil für das gesamte Dokument */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+            position: relative;
+        }
+        
+        /* Container für Statusanzeigen */
+        #status-container {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 20%;
+            right: 10px;
+            gap: 20px;
+        }
+        
+        /* Einheitliches Design für Status */
+        .status-box {
+            width: 120px;
+            padding: 10px;
+            font-size: 14px;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+        }
+        
+        #learned-box { background-color: #a8d5ba; }
+        #repeat-box { background-color: #d8b4e2; }
+        
+        /* Stil für die Karteikarte mit Dreh-Effekt */
+        #card {
+            width: 90%;
+            max-width: 400px;
+            height: 300px;
+            background-color: #eaf7ed;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            text-align: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            color: #36454f;
+            margin-bottom: 20px;
+            transform-origin: center;
+        }
+        
+        #card.show-back {
+            transform: rotateY(180deg);
+        }
+
+        #card-text {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            background-color: #eaf7ed;
+        }
+
+        .back {
+            transform: rotateY(180deg);
+        }
+
+        /* Stil für das Beispiel-Satz */
+        .example-sentence {
+            font-size: 14px;
+            color: #6a6a6a;
+            margin-top: 8px;
+        }
+
+        /* Ursprüngliche Gestaltung für die Buttons */
+        .button-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .button {
+            padding: 12px 24px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            background-color: #a8d5ba;
+            color: white;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:hover { background-color: #8aba9d; }
+
+        #back-button {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #progress-bar {
+            width: 80%;
+            height: 20px;
+            background-color: #cce3d0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 30px;
+            position: relative;
+        }
+        
+        #progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #82c8a0, #3c6e47);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+    </style>
+</head>
+<body>
+    <div id="status-container">
+        <div id="learned-box" class="status-box">Gelernt: <span id="learned-count">0</span></div>
+        <div id="repeat-box" class="status-box">Wiederholen: <span id="repeat-count">15</span></div>
+    </div>
+    
+    <div id="card">
+        <div class="front" id="card-front">
+            <div id="front-text"></div>
+            <div class="example-sentence" id="front-example"></div>
+        </div>
+        <div class="back" id="card-back">
+            <div id="back-text"></div>
+            <div class="example-sentence" id="back-example"></div>
+        </div>
+    </div>
+    
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+    
+    <div class="button-container">
+        <button class="button" id="can-do">Kann ich</button>
+        <button class="button" id="cant-do">Kann ich nicht</button>
+    </div>
+    
+    <button id="back-button" class="button" onclick="window.location.href='index.html';">zurück</button>
+
+    <script>
+        const initialFlashcards = [
+    { german: "der Klassenraum", germanExample: "Der Klassenraum ist groß.", spanish: "el aula", spanishExample: "El aula es grande." },
+    { german: "das Sekretariat", germanExample: "Ich gehe ins Sekretariat.", spanish: "la secretaría", spanishExample: "Voy a la secretaría." },
+    { german: "Informatik", germanExample: "Ich habe Informatikunterricht.", spanish: "la informática", spanishExample: "Tengo clase de informática." },
+    { german: "die Sporthalle", germanExample: "Der Sportunterricht ist in der Sporthalle.", spanish: "el gimnasio", spanishExample: "La clase de deporte es en el gimnasio." },
+    { german: "der Rucksack", germanExample: "Mein Rucksack ist schwer.", spanish: "la mochila", spanishExample: "Mi mochila es pesada." },
+    { german: "der Ordner", germanExample: "Ich lege meine Dokumente in den Ordner.", spanish: "la carpeta", spanishExample: "Guardo mis documentos en la carpeta." },
+    { german: "der Kugelschreiber", germanExample: "Ich schreibe mit einem Kugelschreiber.", spanish: "el bolígrafo", spanishExample: "Escribo con un bolígrafo." },
+    { german: "das Radiergummi", germanExample: "Ich brauche ein Radiergummi.", spanish: "la goma", spanishExample: "Necesito una goma." },
+    { german: "der Laptop", germanExample: "Mein Laptop ist neu.", spanish: "el portátil", spanishExample: "Mi portátil es nuevo." },
+    { german: "der Bleistift", germanExample: "Ich zeichne mit einem Bleistift.", spanish: "el lápiz", spanishExample: "Dibujo con un lápiz." },
+    { german: "das Heft", germanExample: "Ich schreibe Notizen in mein Heft.", spanish: "el cuaderno", spanishExample: "Escribo notas en mi cuaderno." },
+    { german: "das Mäppchen", germanExample: "Meine Stifte sind im Mäppchen.", spanish: "el estuche", spanishExample: "Mis bolígrafos están en el estuche." },
+    { german: "der Taschenrechner", germanExample: "Ich benutze den Taschenrechner.", spanish: "la calculadora", spanishExample: "Uso la calculadora." },
+    { german: "wie viele", germanExample: "Wie viele Bücher hast du?", spanish: "cuántos", spanishExample: "¿Cuántos libros tienes?" },
+    { german: "Spanisch", germanExample: "Ich lerne Spanisch.", spanish: "el castellano", spanishExample: "Estudio castellano." },
+    { german: "Literatur", germanExample: "Ich liebe Literatur.", spanish: "la literatura", spanishExample: "Me encanta la literatura." },
+    { german: "die Pause", germanExample: "Ich esse während der Pause.", spanish: "el recreo", spanishExample: "Como durante el recreo." },
+    { german: "schlecht aussehen", germanExample: "Du siehst heute schlecht aus.", spanish: "tener mala cara", spanishExample: "Tienes mala cara hoy." },
+    { german: "schlecht", germanExample: "Das Wetter ist schlecht.", spanish: "malo, -a", spanishExample: "El tiempo es malo." },
+    { german: "das Gesicht", germanExample: "Sein Gesicht ist freundlich.", spanish: "la cara", spanishExample: "Su cara es amigable." },
+    { german: "suchen", germanExample: "Ich suche meine Schlüssel.", spanish: "buscar", spanishExample: "Busco mis llaves." },
+    { german: "finden", germanExample: "Ich kann mein Buch nicht finden.", spanish: "encontrar", spanishExample: "No puedo encontrar mi libro." },
+    { german: "jemand", germanExample: "Kennt jemand die Antwort?", spanish: "alguien", spanishExample: "¿Alguien sabe la respuesta?" },
+    { german: "anrufen", germanExample: "Ich werde dich später anrufen.", spanish: "llamar", spanishExample: "Te llamaré más tarde." },
+    { german: "leise stellen", germanExample: "Ich stelle mein Handy leise.", spanish: "poner en silencio", spanishExample: "Pongo mi móvil en silencio." },
+    { german: "die Ruhe", germanExample: "Ich mag die Ruhe des Waldes.", spanish: "el silencio", spanishExample: "Me gusta el silencio del bosque." },
+    { german: "denken", germanExample: "Ich denke an meine Freunde.", spanish: "pensar", spanishExample: "Pienso en mis amigos." },
+    { german: "schauen", germanExample: "Ich schaue mir einen Film an.", spanish: "mirar", spanishExample: "Miro una película." },
+    { german: "glauben", germanExample: "Ich glaube, das ist richtig.", spanish: "creer", spanishExample: "Creo que es correcto." },
+    { german: "dass", germanExample: "Ich glaube, dass er kommt.", spanish: "que", spanishExample: "Creo que él viene." },
+    { german: "schlafen", germanExample: "Ich schlafe lange.", spanish: "dormir", spanishExample: "Duermo mucho." },
+    { german: "sich ausruhen", germanExample: "Nach der Arbeit ruhe ich mich aus.", spanish: "relajarse", spanishExample: "Después del trabajo me relajo." },
+    { german: "trinken", germanExample: "Ich trinke jeden Morgen Kaffee.", spanish: "tomar", spanishExample: "Tomo café cada mañana." },
+    { german: "weggehen", germanExample: "Ich muss jetzt weggehen.", spanish: "irse", spanishExample: "Tengo que irme ahora." },
+    { german: "aufstehen", germanExample: "Ich stehe um 7 Uhr auf.", spanish: "levantarse", spanishExample: "Me levanto a las siete." },
+    { german: "die Milch", germanExample: "Ich trinke Milch.", spanish: "la leche", spanishExample: "Bebo leche." },
+    { german: "unser", germanExample: "Das ist unser Haus.", spanish: "nuestro", spanishExample: "Esta es nuestra casa." },
+    { german: "verlieren", germanExample: "Ich verliere oft meinen Schlüssel.", spanish: "perder", spanishExample: "Pierdo mi llave a menudo." },
+    { german: "bleiben", germanExample: "Ich bleibe heute zu Hause.", spanish: "quedarse", spanishExample: "Hoy me quedo en casa." },
+    { german: "sich waschen", germanExample: "Ich wasche mich morgens.", spanish: "lavarse", spanishExample: "Me lavo por la mañana." },
+    { german: "sich duschen", germanExample: "Ich dusche mich jeden Tag.", spanish: "ducharse", spanishExample: "Me ducho todos los días." },
+    { german: "das Wasser", germanExample: "Das Wasser ist kalt.", spanish: "el agua", spanishExample: "El agua está fría." },
+    { german: "sich anziehen", germanExample: "Ich ziehe mich an.", spanish: "ponerse", spanishExample: "Me pongo la ropa." },
+    { german: "ausgehen", germanExample: "Am Samstagabend gehe ich aus.", spanish: "salir", spanishExample: "El sábado por la noche salgo." },
+    { german: "zufrieden sein", germanExample: "Ich bin zufrieden mit meiner Arbeit.", spanish: "estar contento", spanishExample: "Estoy contento con mi trabajo." },
+    { german: "gut", germanExample: "Das Essen schmeckt gut.", spanish: "bueno", spanishExample: "La comida está buena." },
+    { german: "morgen", germanExample: "Morgen habe ich frei.", spanish: "mañana", spanishExample: "Mañana tengo libre." },
+    { german: "viel", germanExample: "Ich habe viel zu tun.", spanish: "mucho", spanishExample: "Tengo mucho que hacer." },
+    { german: "anfangen", germanExample: "Der Unterricht fängt um 9 Uhr an.", spanish: "empezar", spanishExample: "La clase empieza a las nueve." },
+    { german: "wenn", germanExample: "Wenn es regnet, bleibe ich zu Hause.", spanish: "si", spanishExample: "Si llueve, me quedo en casa." },
+    { german: "das Geld", germanExample: "Ich habe kein Geld.", spanish: "el dinero", spanishExample: "No tengo dinero." },
+    { german: "notwendig", germanExample: "Es ist notwendig, gut zu schlafen.", spanish: "necesario, -a", spanishExample: "Es necesario dormir bien." },
+    { german: "lustig", germanExample: "Der Film ist lustig.", spanish: "divertido, -a", spanishExample: "La película es divertida." },
+    { german: "man muss", germanExample: "Man muss pünktlich sein.", spanish: "hay que", spanishExample: "Hay que ser puntual." },
+    { german: "das Salz", germanExample: "Ich brauche Salz für das Rezept.", spanish: "la sal", spanishExample: "Necesito sal para la receta." },
+    { german: "das Ei", germanExample: "Ich koche ein Ei.", spanish: "el huevo", spanishExample: "Cocino un huevo." },
+    { german: "das Problem", germanExample: "Das ist ein großes Problem.", spanish: "el problema", spanishExample: "Es un gran problema." },
+    { german: "bringen", germanExample: "Ich bringe dir das Buch.", spanish: "traer", spanishExample: "Te traigo el libro." },
+    { german: "schnell", germanExample: "Der Zug ist schnell.", spanish: "rápido, -a", spanishExample: "El tren es rápido." },
+    { german: "bestellen", germanExample: "Ich möchte Pizza bestellen.", spanish: "pedir", spanishExample: "Quiero pedir una pizza." }
+
+];
+
+
+        // Funktion zum Mischen der Karteikarten (Fisher-Yates Algorithmus)
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Shuffle die Karteikarten beim Start
+        shuffle(initialFlashcards);
+
+        let flashcards = [...initialFlashcards];
+        let currentCardIndex = 0;
+        let learnedCount = 0;
+        let repeatCount = flashcards.length;
+        let showingFront = true;
+
+        const elements = {
+            frontText: document.getElementById("front-text"),
+            frontExample: document.getElementById("front-example"),
+            backText: document.getElementById("back-text"),
+            backExample: document.getElementById("back-example"),
+            learnedCount: document.getElementById("learned-count"),
+            repeatCount: document.getElementById("repeat-count"),
+            progressBarFill: document.getElementById("progress-fill")
+        };
+
+        elements.repeatCount.textContent = repeatCount;
+
+        function updateCardText() {
+            if (flashcards.length === 0) {
+                elements.frontText.innerHTML = "<b>¡Bien hecho! Haz click para empezar de nuevo</b>";
+                elements.backText.innerHTML = "";
+                elements.frontExample.textContent = "";
+                elements.backExample.textContent = "";
+                document.getElementById("card").onclick = restartFlashcards;
+                return;
+            }
+
+            const currentCard = flashcards[currentCardIndex];
+            elements.frontText.textContent = currentCard.german;
+            elements.frontExample.textContent = currentCard.germanExample;
+            elements.backText.textContent = currentCard.spanish;
+            elements.backExample.textContent = currentCard.spanishExample;
+            document.getElementById("card").classList.toggle('show-back', !showingFront);
+            document.getElementById("card").onclick = () => {
+                showingFront = !showingFront;
+                document.getElementById("card").classList.toggle('show-back');
+            };
+        }
+
+        function updateProgressBar() {
+            const totalCards = initialFlashcards.length;
+            const progressPercentage = (learnedCount / totalCards) * 100;
+            elements.progressBarFill.style.width = `${progressPercentage}%`;
+        }
+
+        function resetProgressBar() {
+            elements.progressBarFill.style.width = `0%`;
+        }
+
+        function restartFlashcards() {
+            flashcards = [...initialFlashcards];
+            shuffle(flashcards); // Mische erneut bei Neustart
+            learnedCount = 0;
+            repeatCount = flashcards.length;
+            elements.learnedCount.textContent = learnedCount;
+            elements.repeatCount.textContent = repeatCount;
+            currentCardIndex = 0;
+            showingFront = true;
+            updateCardText();
+            resetProgressBar();
+        }
+
+        document.getElementById("can-do").addEventListener("click", () => {
+            if (flashcards.length > 0) {
+                flashcards.splice(currentCardIndex, 1);
+                learnedCount++;
+                repeatCount = flashcards.length;
+                elements.learnedCount.textContent = learnedCount;
+                elements.repeatCount.textContent = repeatCount;
+                currentCardIndex = Math.min(currentCardIndex, flashcards.length - 1);
+                showingFront = true;
+                updateCardText();
+                updateProgressBar();
+            }
+        });
+
+        document.getElementById("cant-do").addEventListener("click", () => {
+            if (flashcards.length > 0) {
+                if (currentCardIndex < flashcards.length) {
+                    if (learnedCount + repeatCount < initialFlashcards.length) {
+                        flashcards.push(flashcards.splice(currentCardIndex, 1)[0]);
+                        repeatCount++;
+                        elements.repeatCount.textContent = repeatCount;
+                    }
+                    currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+                    showingFront = true;
+                    updateCardText();
+                }
+            }
+        });
+
+        updateCardText();
+    </script>
+</body>
+</html>

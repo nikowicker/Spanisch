@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Übungen zu Gustar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        h1 {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .dropdown, .settings {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .exercise-section {
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        .exercise-section.active {
+            display: block;
+        }
+        .exercise-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .exercise-item {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1em;
+            border: 1px solid #e0e0e0;
+        }
+        select, input[type="text"] {
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            width: 100%;
+            max-width: 200px;
+            background-color: #f9f9f9;
+            color: #333;
+            margin-top: 10px;
+            transition: border-color 0.3s ease;
+        }
+        select.correct, input[type="text"].correct {
+            background-color: #d4edda; /* grün für korrekt */
+            border-color: #28a745;
+        }
+        select.almost-correct, input[type="text"].almost-correct {
+            background-color: #fff3cd; /* gelb für fast korrekt */
+            border-color: #ffc107;
+        }
+        select.incorrect, input[type="text"].incorrect {
+            border-color: #dc3545; /* rot für inkorrekt */
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+.buttons a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff; /* Ein passender Blauton für die Schaltfläche */
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.buttons a:hover {
+    background-color: #0056b3; /* Ein etwas dunklerer Blauton für den Hover-Effekt */
+    transform: scale(1.05);
+}
+
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdown = document.getElementById("difficulty-select");
+            const sections = document.querySelectorAll(".exercise-section");
+
+            dropdown.addEventListener("change", function() {
+                sections.forEach(section => section.classList.remove("active"));
+                document.getElementById(dropdown.value).classList.add("active");
+            });
+
+            document.querySelectorAll(".exercise-item select").forEach(select => {
+                shuffleOptions(select);
+                select.addEventListener("change", function() {
+                    const correctAnswer = this.getAttribute("data-answer");
+                    this.classList.remove("correct", "almost-correct", "incorrect");
+                    if (this.value === correctAnswer) {
+                        this.classList.add("correct");
+                        this.disabled = true;
+                    } else if (this.value) {
+                        this.classList.add("incorrect");
+                        setTimeout(() => this.classList.remove("incorrect"), 500);
+                    }
+                });
+            });
+
+            document.querySelectorAll(".exercise-item input[type='text']").forEach(input => {
+                input.addEventListener("input", function() {
+                    const correctAnswer = this.getAttribute("data-answer").toLowerCase();
+                    this.classList.remove("correct", "almost-correct", "incorrect");
+                    if (this.value.toLowerCase() === correctAnswer) {
+                        this.classList.add("correct");
+                        this.disabled = true;
+                    } else if (levenshtein(this.value.toLowerCase(), correctAnswer) <= 2) {
+                        this.classList.add("almost-correct");
+                        setTimeout(() => {
+                            this.classList.remove("almost-correct");
+                            this.classList.add("correct");
+                            this.disabled = true;
+                        }, 1000);
+                    } else if (this.value) {
+                        this.classList.add("incorrect");
+                        this.style.animation = "shake 0.3s";
+                        setTimeout(() => {
+                            this.classList.remove("incorrect");
+                            this.style.animation = "";
+                        }, 500);
+                    }
+                });
+            });
+
+            function levenshtein(a, b) {
+                const matrix = Array.from({ length: b.length + 1 }, (_, i) => [i]);
+                for (let j = 1; j <= a.length; j++) matrix[0][j] = j;
+                for (let i = 1; i <= b.length; i++) {
+                    for (let j = 1; j <= a.length; j++) {
+                        matrix[i][j] = b[i - 1] === a[j - 1]
+                            ? matrix[i - 1][j - 1]
+                            : Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
+                    }
+                }
+                return matrix[b.length][a.length];
+            }
+
+            function shuffleOptions(selectElement) {
+                const options = Array.from(selectElement.options).slice(1);
+                options.sort(() => Math.random() - 0.5);
+                options.forEach(option => selectElement.appendChild(option));
+                selectElement.selectedIndex = 0;
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Übungen zu Gustar</h1>
+
+        <div class="dropdown">
+            <label for="difficulty-select">Schwierigkeitsgrad wählen:</label>
+            <select id="difficulty-select">
+                <option value="einfach">Einfach</option>
+                <option value="mittel" selected>Mittel</option>
+                <option value="schwierig">Schwierig</option>
+            </select>
+        </div>
+
+     <!-- Einfache Übungen -->
+        <div id="einfach" class="exercise-section">
+            <h2>Einfach</h2>
+            <p>Wähle die richtige Form von „gustar“:</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. A mí <select data-answer="me gusta">
+                    <option value=""></option>
+                    <option value="me gusta">me gusta</option>
+                    <option value="te gusta">te gusta</option>
+                    <option value="le gusta">le gusta</option>
+                </select> el chocolate. (Ich mag Schokolade)</li>
+                <li class="exercise-item">2. A nosotros <select data-answer="nos gusta">
+                    <option value=""></option>
+                    <option value="nos gusta">nos gusta</option>
+                    <option value="les gusta">les gusta</option>
+                    <option value="me gusta">me gusta</option>
+                </select> la música. (Wir mögen Musik)</li>
+                <li class="exercise-item">3. A ellos <select data-answer="les gusta">
+                    <option value=""></option>
+                    <option value="le gusta">le gusta</option>
+                    <option value="les gusta">les gusta</option>
+                    <option value="te gusta">te gusta</option>
+                </select> bailar. (Sie mögen tanzen)</li>
+            </ul>
+        </div>
+
+        <!-- Mittlere Übungen -->
+        <div id="mittel" class="exercise-section active">
+            <h2>Mittel</h2>
+            <p>Wähle die richtige Form von „gustar“ und das passende Pronomen:</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. A ti <select data-answer="te gusta">
+                    <option value=""></option>
+                    <option value="te gusta">te gusta</option>
+                    <option value="me gusta">me gusta</option>
+                    <option value="le gusta">le gusta</option>
+                </select> la película. (Dir gefällt der Film)</li>
+                <li class="exercise-item">2. A ellos <select data-answer="les gustan">
+                    <option value=""></option>
+                    <option value="les gustan">les gustan</option>
+                    <option value="nos gusta">nos gusta</option>
+                    <option value="me gusta">me gusta</option>
+                </select> los libros de aventuras. (Sie mögen Abenteuerbücher)</li>
+                <li class="exercise-item">3. A nosotros <select data-answer="nos gusta">
+                    <option value=""></option>
+                    <option value="nos gusta">nos gusta</option>
+                    <option value="te gusta">te gusta</option>
+                    <option value="le gusta">le gusta</option>
+                </select> viajar. (Wir mögen reisen)</li>
+            </ul>
+        </div>
+
+        <!-- Schwierige Übungen -->
+        <div id="schwierig" class="exercise-section">
+            <h2>Schwierig</h2>
+            <p>Setze das passende Pronomen und die richtige Form von „gustar“ ein:</p>
+            <ul class="exercise-list">
+                <li class="exercise-item">1. A Juan <input type="text" data-answer="le gusta"> nadar en el mar. (Juan mag es, im Meer zu schwimmen)</li>
+                <li class="exercise-item">2. A mí <input type="text" data-answer="me gustan"> las frutas tropicales. (Ich mag tropische Früchte)</li>
+                <li class="exercise-item">3. A ellos <input type="text" data-answer="les gusta"> correr por la mañana. (Sie mögen es, morgens zu joggen)</li>
+            </ul>
+        </div>
+
+        <div class="buttons">
+            <a href="index.html">Zurück zur Startseite</a>
+        </div>
+    </div>
+</body>
+</html>

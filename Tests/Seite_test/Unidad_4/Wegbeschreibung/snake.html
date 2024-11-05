@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Snake</title>
+    <style>
+        :root {
+            --snake-body-color: #b4e6b3;
+            --snake-head-color: #9ed9b0;
+            --food-color: #ffd7b5;
+            --dead-snake-color: #b39ddb;
+            --border-color: #d4a5d9;
+            --background-color: #e8f7e6;
+            --button-color: #e8f7e6;
+            --button-text-color: #5e5e5e;
+            --countdown-color: #b39ddb;
+            --incorrect-answer-color: #ff6666;
+            --correct-answer-color: #6ecc6e;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: var(--button-text-color);
+            margin: 0;
+            height: 100vh;
+            justify-content: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 0.5em;
+            color: var(--button-text-color);
+            text-align: center;
+        }
+
+        #gameContainer {
+            position: relative;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #gameCanvas {
+            border: 4px solid var(--border-color);
+            background-color: var(--background-color);
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        #scoreBoard {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        #controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .control-button, #newGameButton {
+            background-color: var(--button-color);
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--button-text-color);
+            border-radius: 6px;
+            width: 100%;
+            max-width: 150px;
+            transition: background-color 0.2s;
+            text-align: center;
+        }
+
+        .control-button:hover, #newGameButton:hover {
+            background-color: var(--snake-body-color);
+        }
+
+        #upButton {
+            grid-column: 2;
+        }
+
+        #leftButton {
+            grid-column: 1;
+        }
+
+        #rightButton {
+            grid-column: 3;
+        }
+
+        #downButton {
+            grid-column: 2;
+        }
+
+        #leaderboardContainer {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #leaderboard {
+            border: 2px solid var(--border-color);
+            background-color: var(--background-color);
+            padding: 10px;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .leaderboard-entry {
+            padding: 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+
+        #nameInput {
+            padding: 8px;
+            font-size: 16px;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            outline: none;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        #submitScore, #newGameButton {
+            background-color: var(--button-color);
+            border: 2px solid var(--border-color);
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--button-text-color);
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 150px;
+        }
+
+        #questionOverlay {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            z-index: 10;
+            color: var(--button-text-color);
+            font-size: 18px;
+        }
+
+        #questionBox {
+            background-color: var(--background-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 300px;
+            width: 80%;
+        }
+
+        .answer-button {
+            margin-top: 10px;
+            background-color: var(--button-color);
+            border: 2px solid var(--border-color);
+            padding: 10px;
+            font-size: 16px;
+            color: var(--button-text-color);
+            cursor: pointer;
+            border-radius: 6px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        .correct-flash {
+            animation: correct-flash 0.6s ease;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes correct-flash {
+            0% { background-color: var(--correct-answer-color); }
+            100% { background-color: var(--button-color); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="questionOverlay">
+        <div id="questionBox">
+            <p id="questionText"></p>
+            <div id="answersContainer"></div>
+        </div>
+    </div>
+
+    <h1>Juego de Snake</h1>
+    <div id="scoreBoard">Puntos: 0</div>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+    </div>
+
+    <div id="controls">
+        <button id="upButton" class="control-button" onclick="move('up')">Arriba</button>
+        <button id="leftButton" class="control-button" onclick="move('left')">Izquierda</button>
+        <button id="downButton" class="control-button" onclick="move('down')">Abajo</button>
+        <button id="rightButton" class="control-button" onclick="move('right')">Derecha</button>
+    </div>
+
+    <div id="leaderboardContainer">
+        <div id="leaderboard">
+            <h2>Rangliste</h2>
+            <div id="leaderboardEntries"></div>
+            <input id="nameInput" type="text" placeholder="Dein Name" maxlength="10" />
+            <button id="submitScore" onclick="saveScore()">Punktzahl speichern</button>
+            <button id="newGameButton" onclick="location.href='snake.html'">Neues Spiel</button>
+        </div>
+    </div>
+
+    <audio id="eatSound" src="eat.mp3"></audio>
+    <audio id="gameOverSound" src="gameover.mp3"></audio>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const questionPool = [
+    // Allgemeinwissen
+    { question: "¿Cómo se llama la capital de España?", options: ["Barcelona", "Madrid", "Valencia"], answer: "Madrid" },
+    { question: "¿Cuáles son los colores de la bandera española?", options: ["Rojo y blanco", "Rojo y amarillo", "Azul y blanco"], answer: "Rojo y amarillo" },
+    { question: "¿Cuál es una comida nacional española?", options: ["Sushi", "Pizza", "Paella"], answer: "Paella" },
+    { question: "¿Cuál es el idioma oficial de Brasil?", options: ["Español", "Portugués", "Inglés"], answer: "Portugués" },
+    { question: "¿Qué país es conocido por su Torre Eiffel?", options: ["Italia", "Francia", "España"], answer: "Francia" },
+    { question: "¿En qué continente se encuentra Argentina?", options: ["Europa", "Asia", "América del Sur"], answer: "América del Sur" },
+    { question: "¿Quién escribió 'Don Quijote'?", options: ["Cervantes", "Shakespeare", "Pablo Neruda"], answer: "Cervantes" },
+    { question: "¿Cuál es el océano más grande del mundo?", options: ["Atlántico", "Pacífico", "Índico"], answer: "Pacífico" },
+    { question: "¿Cuál es el río más largo de América del Sur?", options: ["Amazonas", "Nilo", "Mississippi"], answer: "Amazonas" },
+    { question: "¿Cuál es la moneda oficial de México?", options: ["Peso", "Dólar", "Euro"], answer: "Peso" },
+    { question: "¿Qué planeta es conocido como el planeta rojo?", options: ["Marte", "Júpiter", "Venus"], answer: "Marte" },
+    { question: "¿Cuál es el animal nacional de Australia?", options: ["Canguro", "Elefante", "León"], answer: "Canguro" },
+    { question: "¿En qué país se encuentra la ciudad de Berlín?", options: ["Alemania", "Austria", "Francia"], answer: "Alemania" },
+    { question: "¿Qué bebida es famosa en Colombia?", options: ["Té", "Café", "Cerveza"], answer: "Café" },
+    { question: "¿Cuál es el país más grande del mundo?", options: ["Estados Unidos", "Rusia", "China"], answer: "Rusia" },
+    { question: "¿En qué continente está Egipto?", options: ["Europa", "África", "Asia"], answer: "África" },
+    { question: "¿Cuál es la capital de Italia?", options: ["París", "Roma", "Lisboa"], answer: "Roma" },
+    { question: "¿Qué país es famoso por su canal?", options: ["Panamá", "Egipto", "España"], answer: "Panamá" },
+    { question: "¿Qué animal produce lana?", options: ["Perro", "Oveja", "Gato"], answer: "Oveja" },
+    { question: "¿Cuál es el país del tango?", options: ["México", "Argentina", "Brasil"], answer: "Argentina" },
+
+    // Übersetze ins Spanische
+    { question: "¿Cuál es la traducción correcta?: 'Ich gehe heute in die Schule.'", options: ["Voy a la escuela hoy.", "Voy a casa hoy.", "Voy al trabajo hoy."], answer: "Voy a la escuela hoy." },
+    { question: "¿Cuál es la traducción correcta?: 'Die Kinder spielen Fußball.'", options: ["Los niños juegan al baloncesto.", "Los niños juegan al fútbol.", "Los niños juegan al tenis."], answer: "Los niños juegan al fútbol." },
+    { question: "¿Cuál es la traducción correcta?: 'Ich habe ein Buch.'", options: ["Tengo una casa.", "Tengo un libro.", "Tengo una bicicleta."], answer: "Tengo un libro." },
+    { question: "¿Cuál es la traducción correcta?: 'Der Mann trinkt Wasser.'", options: ["El hombre bebe agua.", "El niño bebe agua.", "La mujer bebe agua."], answer: "El hombre bebe agua." },
+    { question: "¿Cuál es la traducción correcta?: 'Ich wohne in Berlin.'", options: ["Vivo en Madrid.", "Vivo en Berlín.", "Vivo en París."], answer: "Vivo en Berlín." },
+    { question: "¿Cuál es la traducción correcta?: 'Die Frau liest eine Zeitung.'", options: ["La mujer lee un libro.", "La mujer lee una revista.", "La mujer lee un periódico."], answer: "La mujer lee un periódico." },
+    { question: "¿Cuál es la traducción correcta?: 'Das Kind isst einen Apfel.'", options: ["El niño come una manzana.", "El niño come una banana.", "El niño come una naranja."], answer: "El niño come una manzana." },
+    { question: "¿Cuál es la traducción correcta?: 'Ich höre Musik.'", options: ["Escucho música.", "Escucho la televisión.", "Escucho la radio."], answer: "Escucho música." },
+    { question: "¿Cuál es la traducción correcta?: 'Die Katze schläft auf dem Sofa.'", options: ["El gato duerme en la cama.", "El gato duerme en el sofá.", "El gato duerme en el suelo."], answer: "El gato duerme en el sofá." },
+    { question: "¿Cuál es la traducción correcta?: 'Wir gehen ins Kino.'", options: ["Vamos al cine.", "Vamos al parque.", "Vamos a la tienda."], answer: "Vamos al cine." },
+
+    // Übersetze ins Deutsche
+    { question: "¿Cuál es la traducción correcta?: 'Me gusta leer.'", options: ["Ich lese gerne.", "Ich schreibe gerne.", "Ich höre gerne Musik."], answer: "Ich lese gerne." },
+    { question: "¿Cuál es la traducción correcta?: 'Tengo hambre.'", options: ["Ich bin hungrig.", "Ich bin durstig.", "Ich bin müde."], answer: "Ich bin hungrig." },
+    { question: "¿Cuál es la traducción correcta?: 'Es un día soleado.'", options: ["Es ist ein sonniger Tag.", "Es ist ein regnerischer Tag.", "Es ist ein kalter Tag."], answer: "Es ist ein sonniger Tag." },
+    { question: "¿Cuál es la traducción correcta?: 'Necesito una bebida.'", options: ["Ich brauche ein Buch.", "Ich brauche ein Getränk.", "Ich brauche einen Freund."], answer: "Ich brauche ein Getränk." },
+    { question: "¿Cuál es la traducción correcta?: 'Ella está cansada.'", options: ["Er ist müde.", "Sie ist müde.", "Sie ist hungrig."], answer: "Sie ist müde." },
+    { question: "¿Cuál es la traducción correcta?: 'Vivo en una ciudad grande.'", options: ["Ich lebe in einem kleinen Dorf.", "Ich lebe in einer großen Stadt.", "Ich lebe in einem Haus."], answer: "Ich lebe in einer großen Stadt." },
+    { question: "¿Cuál es la traducción correcta?: 'Ellos tienen un perro.'", options: ["Sie haben eine Katze.", "Sie haben einen Hund.", "Sie haben ein Haus."], answer: "Sie haben einen Hund." },
+    { question: "¿Cuál es la traducción correcta?: 'Nosotros viajamos en tren.'", options: ["Wir reisen mit dem Auto.", "Wir reisen mit dem Bus.", "Wir reisen mit dem Zug."], answer: "Wir reisen mit dem Zug." },
+    { question: "¿Cuál es la traducción correcta?: 'Hace frío hoy.'", options: ["Es ist kalt heute.", "Es ist warm heute.", "Es ist sonnig heute."], answer: "Es ist kalt heute." },
+    { question: "¿Cuál es la traducción correcta?: 'Ella trabaja en una oficina.'", options: ["Er arbeitet im Büro.", "Sie arbeitet im Büro.", "Sie arbeitet im Krankenhaus."], answer: "Sie arbeitet im Büro." },
+
+    // Weitere Fragen
+    { question: "¿Cuál es el idioma oficial de Japón?", options: ["Coreano", "Japonés", "Chino"], answer: "Japonés" },
+    { question: "¿Cuál es la traducción correcta?: 'Mañana llueve.'", options: ["Es regnet morgen.", "Es scheint morgen.", "Es schneit morgen."], answer: "Es regnet morgen." },
+    { question: "¿Qué instrumento es típico de México?", options: ["Guitarra", "Piano", "Violín"], answer: "Guitarra" },
+    { question: "¿Cuál es la capital de Portugal?", options: ["Madrid", "Lisboa", "Sevilla"], answer: "Lisboa" },
+    { question: "¿Quién pintó la Mona Lisa?", options: ["Van Gogh", "Da Vinci", "Picasso"], answer: "Da Vinci" }
+            ];
+
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function loadRandomQuestion() {
+                const randomIndex = Math.floor(Math.random() * questionPool.length);
+                const selectedQuestion = questionPool[randomIndex];
+                document.getElementById('questionText').textContent = selectedQuestion.question;
+                renderAnswers(selectedQuestion);
+            }
+
+            function renderAnswers(question) {
+                const answersContainer = document.getElementById('answersContainer');
+                answersContainer.innerHTML = '';
+                const shuffledOptions = [...question.options];
+                shuffle(shuffledOptions);
+                
+                shuffledOptions.forEach(option => {
+                    const button = document.createElement('button');
+                    button.classList.add('answer-button');
+                    button.textContent = option;
+                    button.onclick = () => checkAnswer(button, option === question.answer);
+                    answersContainer.appendChild(button);
+                });
+            }
+
+            loadRandomQuestion();
+        });
+
+        function checkAnswer(button, isCorrect) {
+            if (isCorrect) {
+                button.classList.add('correct-flash');
+                setTimeout(() => {
+                    document.getElementById("questionOverlay").style.display = "none";
+                    gameStarted = true;
+                    gameLoop();
+                }, 600);
+            } else {
+                button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--incorrect-answer-color');
+                button.classList.add('shake');
+                setTimeout(() => {
+                    button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--button-color');
+                    button.classList.remove('shake');
+                }, 500);
+            }
+        }
+
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let snake = [{ x: 200, y: 200 }];
+        let direction = { x: 0, y: -15 };
+        let food = {
+            x: Math.floor(Math.random() * 26) * 15,
+            y: Math.floor(Math.random() * 26) * 15
+        };
+        let score = 0;
+        let gameSpeed = 200;
+        const minSpeed = 50;
+        const speedIncrease = 5;
+        let snakeAlive = true;
+        let scoreSaved = false;
+        let gameStarted = false;
+
+        // Array für Bestenliste
+        let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+
+        function updateLeaderboard() {
+            leaderboard.sort((a, b) => b.score - a.score);
+            leaderboard = leaderboard.slice(0, 10);
+            const leaderboardEntries = document.getElementById("leaderboardEntries");
+            leaderboardEntries.innerHTML = '';
+            leaderboard.forEach(entry => {
+                const entryDiv = document.createElement("div");
+                entryDiv.classList.add("leaderboard-entry");
+                entryDiv.textContent = `${entry.name}: ${entry.score} puntos`;
+                leaderboardEntries.appendChild(entryDiv);
+            });
+            localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+        }
+
+        function move(dir) {
+            if (!gameStarted) return;
+            if (dir === 'up' && direction.y === 0) direction = { x: 0, y: -15 };
+            if (dir === 'down' && direction.y === 0) direction = { x: 0, y: 15 };
+            if (dir === 'left' && direction.x === 0) direction = { x: -15, y: 0 };
+            if (dir === 'right' && direction.x === 0) direction = { x: 15, y: 0 };
+        }
+
+        function updateScore() {
+            document.getElementById("scoreBoard").innerText = "Puntos: " + score;
+        }
+
+        function playSound(id) {
+            document.getElementById(id).play();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--food-color');
+            ctx.fillRect(food.x, food.y, 15, 15);
+
+            ctx.fillStyle = snakeAlive ? getComputedStyle(document.documentElement).getPropertyValue('--snake-body-color') : getComputedStyle(document.documentElement).getPropertyValue('--dead-snake-color');
+            snake.slice(1).forEach(segment => {
+                ctx.fillRect(segment.x, segment.y, 15, 15);
+            });
+
+            const head = snake[0];
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--snake-head-color');
+            ctx.fillRect(head.x - 1.5, head.y - 1.5, 18, 18);
+
+            ctx.fillStyle = "#3b3b3b";
+            const eyeOffset = 4;
+            if (direction.x === 15) {
+                ctx.fillRect(head.x + 6, head.y + eyeOffset, 2, 2);
+                ctx.fillRect(head.x + 6, head.y + 11, 2, 2);
+            } else if (direction.x === -15) {
+                ctx.fillRect(head.x + 6, head.y + eyeOffset, 2, 2);
+                ctx.fillRect(head.x + 6, head.y + 11, 2, 2);
+            } else if (direction.y === 15) {
+                ctx.fillRect(head.x + eyeOffset, head.y + 6, 2, 2);
+                ctx.fillRect(head.x + 11, head.y + 6, 2, 2);
+            } else if (direction.y === -15) {
+                ctx.fillRect(head.x + eyeOffset, head.y + 6, 2, 2);
+                ctx.fillRect(head.x + 11, head.y + 6, 2, 2);
+            }
+        }
+
+        function update() {
+            if (!snakeAlive || !gameStarted) return;
+
+            const newHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            const isEating = 
+                newHead.x < food.x + 15 &&
+                newHead.x + 15 > food.x &&
+                newHead.y < food.y + 15 &&
+                newHead.y + 15 > food.y;
+
+            if (isEating) {
+                score++;
+                updateScore();
+                playSound("eatSound");
+                food = {
+                    x: Math.floor(Math.random() * 26) * 15,
+                    y: Math.floor(Math.random() * 26) * 15
+                };
+                if (gameSpeed > minSpeed) {
+                    gameSpeed -= speedIncrease;
+                }
+            } else {
+                snake.pop();
+            }
+
+            if (
+                newHead.x < 0 || newHead.x >= canvas.width ||
+                newHead.y < 0 || newHead.y >= canvas.height ||
+                snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
+            ) {
+                snakeAlive = false;
+                shakeAndFadeOut();
+                return;
+            }
+
+            snake.unshift(newHead);
+            draw();
+        }
+
+        function shakeAndFadeOut() {
+            const gameContainer = document.getElementById("gameContainer");
+            gameContainer.style.transition = "background-color 0.5s ease";
+            gameContainer.style.backgroundColor = "rgba(0,0,0,0.4)";
+            let shakeCount = 0;
+            const shakeInterval = setInterval(() => {
+                gameContainer.style.transform = `translateX(${shakeCount % 2 === 0 ? -10 : 10}px)`;
+                shakeCount++;
+                if (shakeCount >= 6) {
+                    clearInterval(shakeInterval);
+                    gameContainer.style.transform = "translateX(0)";
+                    endGame();
+                }
+            }, 100);
+        }
+
+        function endGame() {
+            document.getElementById("controls").style.display = "none";
+            document.getElementById("gameCanvas").style.display = "none";
+            document.getElementById("leaderboardContainer").style.display = "block";
+            updateLeaderboard();
+        }
+
+        function saveScore() {
+            if (scoreSaved) return;
+            const name = document.getElementById("nameInput").value.trim();
+            if (name === "") {
+                alert("Por favor, ingrese su nombre para guardar la puntuación.");
+                return;
+            }
+
+            leaderboard.push({ name: name, score: score });
+            updateLeaderboard();
+            scoreSaved = true;
+        }
+
+        function gameLoop() {
+            update();
+            setTimeout(gameLoop, gameSpeed);
+        }
+    </script>
+</body>
+</html>
