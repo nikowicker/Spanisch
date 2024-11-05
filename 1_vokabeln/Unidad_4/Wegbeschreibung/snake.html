@@ -317,40 +317,41 @@ body {
     { question: "¿Quién pintó la Mona Lisa?", options: ["Van Gogh", "Da Vinci", "Picasso"], answer: "Da Vinci" }
 ];
 
-let attemptCount = 0; // Variable für die Anzahl der Versuche
+let attemptCount = 0; // Anzahl der Versuche
 
-            function shuffle(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-            }
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
 
-            function loadRandomQuestion() {
-                attemptCount = 0;
-                const randomIndex = Math.floor(Math.random() * questionPool.length);
-                const selectedQuestion = questionPool[randomIndex];
-                document.getElementById('questionText').textContent = selectedQuestion.question;
-                renderAnswers(selectedQuestion);
-            }
+    function loadRandomQuestion() {
+        attemptCount = 0;
+        const randomIndex = Math.floor(Math.random() * questionPool.length);
+        const selectedQuestion = questionPool[randomIndex];
+        document.getElementById('questionText').textContent = selectedQuestion.question;
+        renderAnswers(selectedQuestion);
+        document.getElementById("questionOverlay").style.display = "flex"; // Frage-Overlay anzeigen
+    }
 
-            function renderAnswers(question) {
-                const answersContainer = document.getElementById('answersContainer');
-                answersContainer.innerHTML = '';
-                const shuffledOptions = [...question.options];
-                shuffle(shuffledOptions);
-                
-                shuffledOptions.forEach(option => {
-                    const button = document.createElement('button');
-                    button.classList.add('answer-button');
-                    button.textContent = option;
-                    button.onclick = () => checkAnswer(button, option === question.answer);
-                    answersContainer.appendChild(button);
-                });
-            }
+    function renderAnswers(question) {
+        const answersContainer = document.getElementById('answersContainer');
+        answersContainer.innerHTML = '';
+        const shuffledOptions = [...question.options];
+        shuffle(shuffledOptions);
 
-            loadRandomQuestion();
+        shuffledOptions.forEach(option => {
+            const button = document.createElement('button');
+            button.classList.add('answer-button');
+            button.textContent = option;
+            button.onclick = () => checkAnswer(button, option === question.answer);
+            answersContainer.appendChild(button);
         });
+    }
+
+    loadRandomQuestion();
+});
 
         function checkAnswer(button, isCorrect, question) {
     if (isCorrect) {
