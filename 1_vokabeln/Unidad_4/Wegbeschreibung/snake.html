@@ -32,6 +32,8 @@ body {
     justify-content: center;
     padding: 10px;
     box-sizing: border-box;
+position: relative; /* Wichtig für die Zentrierung von #leaderboardContainer */
+
 }
 
 /* Diese Zeile außerhalb des body-Selectors */
@@ -113,20 +115,32 @@ body {
             grid-column: 2;
         }
 
-        #leaderboardContainer {
-            display: none;
-            margin-top: 20px;
-            text-align: center;
-        }
+#leaderboardContainer {
+    display: none; /* Unsichtbar bis zum Spielende */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Halbdurchsichtiger schwarzer Hintergrund */
+    color: white;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    text-align: center;
+}
 
-        #leaderboard {
-            border: 2px solid var(--border-color);
-            background-color: var(--background-color);
-            padding: 10px;
-            max-width: 400px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-        }
+
+    #leaderboard {
+    border: 2px solid var(--border-color);
+    background-color: var(--background-color);
+    padding: 20px; /* Etwas mehr Innenabstand */
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    text-align: center;
+}
+
 
         .leaderboard-entry {
             padding: 5px;
@@ -250,9 +264,9 @@ body {
         <div id="leaderboard">
             <h2>Rangliste</h2>
             <div id="leaderboardEntries"></div>
-            <input id="nameInput" type="text" placeholder="Dein Name" maxlength="10" />
-            <button id="submitScore" onclick="saveScore()">Punktzahl speichern</button>
-            <button id="newGameButton" onclick="startNewGame()">Neues Spiel</button>
+<input id="nameInput" type="text" placeholder="Dein Name" maxlength="10" />
+<button id="submitScore" onclick="saveScore()">Punktzahl speichern</button>
+<button id="newGameButton" onclick="window.location.href='snake.html'">Neues Spiel</button>
         </div>
     </div>
 
@@ -317,8 +331,34 @@ body {
     { question: "¿Quién pintó la Mona Lisa?", options: ["Van Gogh", "Da Vinci", "Picasso"], answer: "Da Vinci" }
 ];
 
-let attemptCount = 0; // Anzahl der Versuche
+ let attemptCount = 0; // Anzahl der Versuche
+    let gameStarted = false; // Flag zum Starten des Spiels nur nach der Frage
+    console.log("DOMContentLoaded: Seite geladen");
 
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    console.log("Canvas initialized:", ctx !== null);
+
+ // Hier fügst du die Event Listener für die Steuerungsbuttons hinzu
+    document.getElementById("upButton").addEventListener("click", () => move("up"));
+    document.getElementById("leftButton").addEventListener("click", () => move("left"));
+    document.getElementById("downButton").addEventListener("click", () => move("down"));
+    document.getElementById("rightButton").addEventListener("click", () => move("right"));
+
+    let snake = [{ x: 200, y: 200 }];
+    let direction = { x: 0, y: -15 };
+    let food = {
+        x: Math.floor(Math.random() * 26) * 15,
+        y: Math.floor(Math.random() * 26) * 15
+    };
+    let score = 0;
+    let gameSpeed = 200;
+    const minSpeed = 50;
+    const speedIncrease = 5;
+    let snakeAlive = true;
+    let scoreSaved = false;
+
+    // Funktion zum Mischen des Arrays
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -326,6 +366,7 @@ let attemptCount = 0; // Anzahl der Versuche
         }
     }
 
+    // Funktion zum Laden einer zufälligen Frage
     function loadRandomQuestion() {
         attemptCount = 0;
         const randomIndex = Math.floor(Math.random() * questionPool.length);
@@ -335,6 +376,7 @@ let attemptCount = 0; // Anzahl der Versuche
         document.getElementById("questionOverlay").style.display = "flex"; // Frage-Overlay anzeigen
     }
 
+    // Funktion zum Darstellen der Antworten
     function renderAnswers(question) {
         const answersContainer = document.getElementById('answersContainer');
         answersContainer.innerHTML = '';
@@ -350,218 +392,152 @@ let attemptCount = 0; // Anzahl der Versuche
         });
     }
 
-    loadRandomQuestion();
-});
+    loadRandomQuestion(); // Die erste Frage wird beim Laden der Seite angezeigt
 
-        function checkAnswer(button, isCorrect, question) {
-    if (isCorrect) {
-        button.classList.add('correct-flash');
-        setTimeout(() => {
-            document.getElementById("questionOverlay").style.display = "none";
-            gameStarted = true;
-            startBackgroundMusic();
-            gameLoop();
-        }, 600);
-    } else {
-        button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--incorrect-answer-color');
-        button.classList.add('shake');
-        attemptCount++; // Erhöhe die Anzahl der Versuche
+    function checkAnswer(button, isCorrect) {
+    console.log("Answer checked, is it correct?", isCorrect); // Hier wird überprüft, ob die Antwort korrekt ist
 
-        // Überprüfen, ob die maximale Anzahl der Versuche erreicht wurde
-        if (attemptCount >= 2) {
-            setTimeout(() => {
-                loadRandomQuestion(); // Neue Frage laden
-            }, 500);
+     if (isCorrect) {
+    button.classList.add('correct-flash');
+    console.log("Correct answer given. Starting game..."); // Anzeige bei korrekter Antwort
+    document.getElementById("questionOverlay").style.display = "none";
+    gameStarted = true;
+    // startBackgroundMusic();  // Temporär auskommentiert, um Fehler auszuschließen
+    gameLoop(); // Direktaufruf ohne setTimeout
+
         } else {
-            setTimeout(() => {
-                button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--button-color');
-                button.classList.remove('shake');
-            }, 500);
+            button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--incorrect-answer-color');
+            button.classList.add('shake');
+            attemptCount++;
+
+            if (attemptCount >= 2) {
+                setTimeout(() => {
+                    loadRandomQuestion(); // Neue Frage laden nach zwei falschen Versuchen
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--button-color');
+                    button.classList.remove('shake');
+                }, 500);
+            }
         }
     }
 
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
+  function move(dir) {
+    if (!gameStarted) {
+        console.log("Move attempted before game started");
+        return;
+    }
+    console.log("Moving:", dir); // Überprüfen, ob die Funktion aufgerufen wird
+    
+    if (dir === 'up' && direction.y === 0) direction = { x: 0, y: -15 };
+    if (dir === 'down' && direction.y === 0) direction = { x: 0, y: 15 };
+    if (dir === 'left' && direction.x === 0) direction = { x: -15, y: 0 };
+    if (dir === 'right' && direction.x === 0) direction = { x: 15, y: 0 };
+}
 
-        let snake = [{ x: 200, y: 200 }];
-        let direction = { x: 0, y: -15 };
-        let food = {
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--food-color');
+        ctx.fillRect(food.x, food.y, 15, 15);
+
+        ctx.fillStyle = snakeAlive ? getComputedStyle(document.documentElement).getPropertyValue('--snake-body-color') : getComputedStyle(document.documentElement).getPropertyValue('--dead-snake-color');
+        snake.slice(1).forEach(segment => {
+            ctx.fillRect(segment.x, segment.y, 15, 15);
+        });
+
+        const head = snake[0];
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--snake-head-color');
+        ctx.fillRect(head.x - 1.5, head.y - 1.5, 18, 18);
+    }
+
+ function update() {
+    if (!snakeAlive || !gameStarted) return;
+
+    const newHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+    const isEating = 
+        newHead.x < food.x + 15 &&
+        newHead.x + 15 > food.x &&
+        newHead.y < food.y + 15 &&
+        newHead.y + 15 > food.y;
+
+    if (isEating) {
+        score++;
+        updateScore();
+    console.log("Score erhöht auf:", score); // Zeigt den neuen Score nach Fressen des Futters an
+        food = {
             x: Math.floor(Math.random() * 26) * 15,
             y: Math.floor(Math.random() * 26) * 15
         };
-        let score = 0;
-        let gameSpeed = 200;
-        const minSpeed = 50;
-        const speedIncrease = 5;
-        let snakeAlive = true;
-        let scoreSaved = false;
-        let gameStarted = false;
-
-        // Hintergrundmusik Steuerung
-        const backgroundMusic = document.getElementById("backgroundMusic");
-        const eatSound = document.getElementById("eatSound");
-        const gameOverSound = document.getElementById("gameOverSound");
-
-        function startBackgroundMusic() {
-            backgroundMusic.play();
+        if (gameSpeed > minSpeed) {
+            gameSpeed -= speedIncrease;
         }
+    } else {
+        snake.pop();
+    }
 
-        function stopBackgroundMusic() {
-            backgroundMusic.pause();
-            backgroundMusic.currentTime = 0; // Zurückspulen zum Anfang
-        }
+    // Kollisionserkennung und Spielende-Aufruf
+    if (
+        newHead.x < 0 || newHead.x >= canvas.width ||
+        newHead.y < 0 || newHead.y >= canvas.height ||
+        snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
+    ) {
+        snakeAlive = false;
+        shakeAndFadeOut(); // Nur aufrufen, wenn die Schlange stirbt
+        return;
+    }
 
-        // Array für Bestenliste
-        let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    snake.unshift(newHead);
+    draw();
+}
 
-        function updateLeaderboard() {
-            leaderboard.sort((a, b) => b.score - a.score);
-            leaderboard = leaderboard.slice(0, 10);
-            const leaderboardEntries = document.getElementById("leaderboardEntries");
-            leaderboardEntries.innerHTML = '';
-            leaderboard.forEach(entry => {
-                const entryDiv = document.createElement("div");
-                entryDiv.classList.add("leaderboard-entry");
-                entryDiv.textContent = `${entry.name}: ${entry.score} puntos`;
-                leaderboardEntries.appendChild(entryDiv);
-            });
-            localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
-        }
 
-        function move(dir) {
-            if (!gameStarted) return;
-            if (dir === 'up' && direction.y === 0) direction = { x: 0, y: -15 };
-            if (dir === 'down' && direction.y === 0) direction = { x: 0, y: 15 };
-            if (dir === 'left' && direction.x === 0) direction = { x: -15, y: 0 };
-            if (dir === 'right' && direction.x === 0) direction = { x: 15, y: 0 };
-        }
+  function updateScore() {
+    document.getElementById("scoreBoard").innerText = "Puntos: " + score;
+    console.log("Aktueller Score:", score); // Überprüft den Score nach jeder Aktualisierung
+}
 
-        function updateScore() {
-            document.getElementById("scoreBoard").innerText = "Puntos: " + score;
-        }
+function shakeAndFadeOut() {
+    console.log("Spiel beendet - finaler Score:", score); // Prüft den Score am Spielende
+    document.getElementById("leaderboardContainer").style.display = "flex";
+    gameStarted = false;
+document.getElementById("submitScore").addEventListener("click", saveScore);
 
-        function playSound(sound) {
-            sound.currentTime = 0;
-            sound.play();
-        }
+}
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--food-color');
-            ctx.fillRect(food.x, food.y, 15, 15);
-
-            ctx.fillStyle = snakeAlive ? getComputedStyle(document.documentElement).getPropertyValue('--snake-body-color') : getComputedStyle(document.documentElement).getPropertyValue('--dead-snake-color');
-            snake.slice(1).forEach(segment => {
-                ctx.fillRect(segment.x, segment.y, 15, 15);
-            });
-
-            const head = snake[0];
-            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--snake-head-color');
-            ctx.fillRect(head.x - 1.5, head.y - 1.5, 18, 18);
-
-            ctx.fillStyle = "#3b3b3b";
-            const eyeOffset = 4;
-            if (direction.x === 15) {
-                ctx.fillRect(head.x + 6, head.y + eyeOffset, 2, 2);
-                ctx.fillRect(head.x + 6, head.y + 11, 2, 2);
-            } else if (direction.x === -15) {
-                ctx.fillRect(head.x + 6, head.y + eyeOffset, 2, 2);
-                ctx.fillRect(head.x + 6, head.y + 11, 2, 2);
-            } else if (direction.y === 15) {
-                ctx.fillRect(head.x + eyeOffset, head.y + 6, 2, 2);
-                ctx.fillRect(head.x + 11, head.y + 6, 2, 2);
-            } else if (direction.y === -15) {
-                ctx.fillRect(head.x + eyeOffset, head.y + 6, 2, 2);
-                ctx.fillRect(head.x + 11, head.y + 6, 2, 2);
-            }
-        }
-
-        function update() {
-            if (!snakeAlive || !gameStarted) return;
-
-            const newHead = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-            const isEating = 
-                newHead.x < food.x + 15 &&
-                newHead.x + 15 > food.x &&
-                newHead.y < food.y + 15 &&
-                newHead.y + 15 > food.y;
-
-            if (isEating) {
-                score++;
-                updateScore();
-                playSound(eatSound);
-                food = {
-                    x: Math.floor(Math.random() * 26) * 15,
-                    y: Math.floor(Math.random() * 26) * 15
-                };
-                if (gameSpeed > minSpeed) {
-                    gameSpeed -= speedIncrease;
-                }
-            } else {
-                snake.pop();
-            }
-
-            if (
-                newHead.x < 0 || newHead.x >= canvas.width ||
-                newHead.y < 0 || newHead.y >= canvas.height ||
-                snake.some(segment => segment.x === newHead.x && segment.y === newHead.y)
-            ) {
-                snakeAlive = false;
-                playSound(gameOverSound);
-                shakeAndFadeOut();
-                return;
-            }
-
-            snake.unshift(newHead);
-            draw();
-        }
-
-        function shakeAndFadeOut() {
-            const gameContainer = document.getElementById("gameContainer");
-            gameContainer.style.transition = "background-color 0.5s ease";
-            gameContainer.style.backgroundColor = "rgba(0,0,0,0.4)";
-            let shakeCount = 0;
-            const shakeInterval = setInterval(() => {
-                gameContainer.style.transform = `translateX(${shakeCount % 2 === 0 ? -10 : 10}px)`;
-                shakeCount++;
-                if (shakeCount >= 6) {
-                    clearInterval(shakeInterval);
-                    gameContainer.style.transform = "translateX(0)";
-                    endGame();
-                }
-            }, 100);
-        }
-
-        function endGame() {
-            stopBackgroundMusic();
-            document.getElementById("controls").style.display = "none";
-            document.getElementById("gameCanvas").style.display = "none";
-            document.getElementById("leaderboardContainer").style.display = "block";
-            updateLeaderboard();
-        }
-
-        function saveScore() {
-            if (scoreSaved) return;
-            const name = document.getElementById("nameInput").value.trim();
-            if (name === "") {
-                alert("Por favor, ingrese su nombre para guardar la puntuación.");
-                return;
-            }
-
-            leaderboard.push({ name: name, score: score });
-            updateLeaderboard();
-            scoreSaved = true;
-        }
-
-        function startNewGame() {
-            location.reload();
-        }
-
-        function gameLoop() {
+    function gameLoop() {
+    console.log("Game loop running. Game started:true", gameStarted); // Debugging-Ausgabe
+        if (gameStarted) {
             update();
             setTimeout(gameLoop, gameSpeed);
         }
+    }
+function shakeAndFadeOut() {
+    console.log("Game Over - Snake is dead");
+    document.getElementById("leaderboardContainer").style.display = "flex"; // Ändert auf "flex" für Zentrierung
+    gameStarted = false;
+}
+function saveScore() {
+    console.log("saveScore wurde aufgerufen"); // Um zu prüfen, ob die Funktion ausgeführt wird
+    const nameInput = document.getElementById("nameInput");
+    const leaderboardEntries = document.getElementById("leaderboardEntries");
+
+    if (nameInput.value) { // Prüfen, ob ein Name eingegeben wurde
+        const entry = document.createElement("div");
+        entry.classList.add("leaderboard-entry");
+        entry.textContent = `${nameInput.value} - ${score} Punkte`;
+
+        leaderboardEntries.appendChild(entry);
+        nameInput.value = ""; // Leeren des Eingabefeldes
+    } else {
+        alert("Bitte gib deinen Namen ein.");
+    }
+}
+});
+
+
     </script>
     
        <script>
