@@ -314,6 +314,8 @@
     { question: "¿Quién pintó la Mona Lisa?", options: ["Van Gogh", "Da Vinci", "Picasso"], answer: "Da Vinci" }
 ];
 
+let attemptCount = 0; // Variable für die Anzahl der Versuche
+
             function shuffle(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
@@ -322,6 +324,7 @@
             }
 
             function loadRandomQuestion() {
+                attemptCount = 0;
                 const randomIndex = Math.floor(Math.random() * questionPool.length);
                 const selectedQuestion = questionPool[randomIndex];
                 document.getElementById('questionText').textContent = selectedQuestion.question;
@@ -346,24 +349,32 @@
             loadRandomQuestion();
         });
 
-        function checkAnswer(button, isCorrect) {
-            if (isCorrect) {
-                button.classList.add('correct-flash');
-                setTimeout(() => {
-                    document.getElementById("questionOverlay").style.display = "none";
-                    gameStarted = true;
-                    startBackgroundMusic(); // Hintergrundmusik starten
-                    gameLoop();
-                }, 600);
-            } else {
-                button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--incorrect-answer-color');
-                button.classList.add('shake');
-                setTimeout(() => {
-                    button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--button-color');
-                    button.classList.remove('shake');
-                }, 500);
-            }
+        function checkAnswer(button, isCorrect, question) {
+    if (isCorrect) {
+        button.classList.add('correct-flash');
+        setTimeout(() => {
+            document.getElementById("questionOverlay").style.display = "none";
+            gameStarted = true;
+            startBackgroundMusic();
+            gameLoop();
+        }, 600);
+    } else {
+        button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--incorrect-answer-color');
+        button.classList.add('shake');
+        attemptCount++; // Erhöhe die Anzahl der Versuche
+
+        // Überprüfen, ob die maximale Anzahl der Versuche erreicht wurde
+        if (attemptCount >= 2) {
+            setTimeout(() => {
+                loadRandomQuestion(); // Neue Frage laden
+            }, 500);
+        } else {
+            setTimeout(() => {
+                button.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--button-color');
+                button.classList.remove('shake');
+            }, 500);
         }
+    }
 
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
