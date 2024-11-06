@@ -125,96 +125,126 @@
             background-color: #EEEEEE;
         }
     </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const dropdown = document.getElementById("difficulty-select");
-            const sections = document.querySelectorAll(".exercise-section");
+ <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const dropdown = document.getElementById("difficulty-select");
+        const sections = document.querySelectorAll(".exercise-section");
 
-            // Funktion zur zufälligen Anordnung der Optionen im Dropdown-Menü
-            function shuffleOptions(selectElement) {
-                const options = Array.from(selectElement.options).slice(1); // Ohne leere Option
-                options.sort(() => Math.random() - 0.5);
-                options.forEach(option => selectElement.appendChild(option));
+        // Funktion zur zufälligen Anordnung der Optionen im Dropdown-Menü
+        function shuffleOptions(selectElement) {
+            const options = Array.from(selectElement.options).slice(1); // Ohne leere Option
+            options.sort(() => Math.random() - 0.5);
+            options.forEach(option => selectElement.appendChild(option));
+        }
+
+        // Funktion zur zufälligen Anordnung der Übungen
+        function shuffleExercises(section) {
+            const exerciseList = section.querySelector(".exercise-list");
+            if (exerciseList) {
+                const exercises = Array.from(exerciseList.children);
+                shuffleArray(exercises); // Zufällige Anordnung der Übungen
+                exerciseList.innerHTML = ""; // Lösche aktuelle Reihenfolge
+                exercises.forEach(exercise => exerciseList.appendChild(exercise));
             }
+        }
 
-            dropdown.addEventListener("change", function() {
-                sections.forEach(section => {
-                    section.classList.remove("active");
-                });
-                document.getElementById(dropdown.value).classList.add("active");
-            });
-
-            document.querySelectorAll(".exercise-item select").forEach(select => {
-                // Leere Standardoption hinzufügen
-                const placeholderOption = document.createElement("option");
-                placeholderOption.value = "";
-                placeholderOption.textContent = "";
-                select.insertBefore(placeholderOption, select.firstChild);
-                select.selectedIndex = 0; // Startet mit leerer Option
-                shuffleOptions(select);
-
-                select.addEventListener("change", function() {
-                    const correctAnswer = this.getAttribute("data-answer");
-                    if (this.value === correctAnswer) {
-                        this.classList.add("correct");
-                        this.disabled = true; // Antwort wird fixiert
-                    } else {
-                        this.classList.add("incorrect");
-                        setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
-                    }
-                });
-            });
-
-            // Toleranz für bis zu 2 Tippfehler bei Schwierigkeitsgrad "Schwierig"
-            function levenshtein(a, b) {
-                const matrix = [];
-                let i, j;
-                if (!a.length) return b.length;
-                if (!b.length) return a.length;
-
-                for (i = 0; i <= b.length; i++) {
-                    matrix[i] = [i];
-                }
-                for (j = 0; j <= a.length; j++) {
-                    matrix[0][j] = j;
-                }
-                for (i = 1; i <= b.length; i++) {
-                    for (j = 1; j <= a.length; j++) {
-                        if (b.charAt(i - 1) === a.charAt(j - 1)) {
-                            matrix[i][j] = matrix[i - 1][j - 1];
-                        } else {
-                            matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
-                        }
-                    }
-                }
-                return matrix[b.length][a.length];
+        // Funktion zum Mischen eines Arrays (Fisher-Yates-Algorithmus)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
             }
+        }
 
-            document.querySelectorAll(".exercise-item input[type='text']").forEach(input => {
-                input.addEventListener("input", function() {
-                    const correctAnswer = this.getAttribute("data-answer");
-                    const distance = levenshtein(this.value.toLowerCase(), correctAnswer.toLowerCase());
+        // Event-Listener für Dropdown zur Auswahl der Schwierigkeitsstufe
+        dropdown.addEventListener("change", function() {
+            sections.forEach(section => {
+                section.classList.remove("active");
+            });
+            document.getElementById(dropdown.value).classList.add("active");
+        });
 
-                    if (distance === 0) { // Ganz korrekte Antwort
-                        this.classList.add("correct");
-                        this.classList.remove("incorrect", "almost-correct");
-                        this.disabled = true; // Antwort fixieren
-                    } else if (distance <= 2) { // Fast richtige Antwort (bis zu 2 Tippfehler)
-                        setTimeout(() => {
-                            if (!this.disabled && this.value.toLowerCase() === this.value.toLowerCase()) {
-                                this.classList.add("almost-correct");
-                                this.classList.remove("correct", "incorrect");
-                                this.disabled = true; // Antwort fixieren
-                            }
-                        }, 1000); // Verzögertes Feedback für fast korrekte Antworten
-                    } else { // Falsche Antwort
-                        this.classList.add("incorrect");
-                        setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
-                    }
-                });
+        // Anwenden der zufälligen Anordnung der Optionen
+        document.querySelectorAll(".exercise-item select").forEach(select => {
+            // Leere Standardoption hinzufügen
+            const placeholderOption = document.createElement("option");
+            placeholderOption.value = "";
+            placeholderOption.textContent = "";
+            select.insertBefore(placeholderOption, select.firstChild);
+            select.selectedIndex = 0; // Startet mit leerer Option
+
+            // Shuffle der Auswahlmöglichkeiten
+            shuffleOptions(select);
+
+            select.addEventListener("change", function() {
+                const correctAnswer = this.getAttribute("data-answer");
+                if (this.value === correctAnswer) {
+                    this.classList.add("correct");
+                    this.disabled = true; // Antwort wird fixiert
+                } else {
+                    this.classList.add("incorrect");
+                    setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
+                }
             });
         });
-    </script>
+
+        // Zufällige Anordnung der Übungen in jeder Sektion
+        sections.forEach(section => {
+            shuffleExercises(section);
+        });
+
+        // Toleranz für bis zu 2 Tippfehler bei Schwierigkeitsgrad "Schwierig"
+        function levenshtein(a, b) {
+            const matrix = [];
+            let i, j;
+            if (!a.length) return b.length;
+            if (!b.length) return a.length;
+
+            for (i = 0; i <= b.length; i++) {
+                matrix[i] = [i];
+            }
+            for (j = 0; j <= a.length; j++) {
+                matrix[0][j] = j;
+            }
+            for (i = 1; i <= b.length; i++) {
+                for (j = 1; j <= a.length; j++) {
+                    if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1));
+                    }
+                }
+            }
+            return matrix[b.length][a.length];
+        }
+
+        // Feedback für Texteingaben mit Tippfehler-Toleranz
+        document.querySelectorAll(".exercise-item input[type='text']").forEach(input => {
+            input.addEventListener("input", function() {
+                const correctAnswer = this.getAttribute("data-answer");
+                const distance = levenshtein(this.value.toLowerCase(), correctAnswer.toLowerCase());
+
+                if (distance === 0) { // Ganz korrekte Antwort
+                    this.classList.add("correct");
+                    this.classList.remove("incorrect", "almost-correct");
+                    this.disabled = true; // Antwort fixieren
+                } else if (distance <= 2) { // Fast richtige Antwort (bis zu 2 Tippfehler)
+                    setTimeout(() => {
+                        if (!this.disabled && this.value.toLowerCase() === this.value.toLowerCase()) {
+                            this.classList.add("almost-correct");
+                            this.classList.remove("correct", "incorrect");
+                            this.disabled = true; // Antwort fixieren
+                        }
+                    }, 1000); // Verzögertes Feedback für fast korrekte Antworten
+                } else { // Falsche Antwort
+                    this.classList.add("incorrect");
+                    setTimeout(() => this.classList.remove("incorrect"), 500); // Rotes Aufleuchten der Umrandung und Vibrieren
+                }
+            });
+        });
+    });
+</script>
+
 </head>
 <body>
 
@@ -230,44 +260,263 @@
                 <option value="schwierig">Schwierig</option>
             </select>
         </div>
+<!-- Einfache Aufgaben -->
+<div id="einfach" class="exercise-section">
+    <h2>Einfach</h2>
+    <p>Elige la forma correcta del verbo en el Imperfecto (2 opciones de respuesta):</p>
+    <ul class="exercise-list">
+        <li class="exercise-item">
+            Yo <select data-answer="hablaba">
+                <option value=""></option>
+                <option value="hablaba">hablaba</option>
+                <option value="hablaban">hablaban</option>
+            </select> con mis amigos todos los días. (hablar)
+        </li>
+        <li class="exercise-item">
+           Tú <select data-answer="jugabas">
+                <option value=""></option>
+                <option value="jugabas">jugabas</option>
+                <option value="jugaban">jugaban</option>
+            </select> en el parque. (jugar)
+        </li>
+        <li class="exercise-item">
+            Él <select data-answer="comía">
+                <option value=""></option>
+                <option value="comía">comía</option>
+                <option value="comían">comían</option>
+            </select> helado a menudo. (comer)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="vivíamos">
+                <option value=""></option>
+                <option value="vivíamos">vivíamos</option>
+                <option value="vivía">vivía</option>
+            </select> en una pequeña ciudad. (vivir)
+        </li>
+        <li class="exercise-item">
+            Ellos <select data-answer="trabajaban">
+                <option value=""></option>
+                <option value="trabajaba">trabajaba</option>
+                <option value="trabajaban">trabajaban</option>
+            </select> en una fábrica. (trabajar)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="escalábamos">
+                <option value=""></option>
+                <option value="escalábamos">escalábamos</option>
+                <option value="escalaban">escalaban</option>
+            </select> las montañas con frecuencia. (escalar)
+        </li>
+        <li class="exercise-item">
+            Tú <select data-answer="hacías">
+                <option value=""></option>
+                <option value="hacías">hacías</option>
+                <option value="hacían">hacían</option>
+            </select> siempre las compras. (hacer la compra)
+        </li>
+        <li class="exercise-item">
+            Yo <select data-answer="escribía">
+                <option value=""></option>
+                <option value="escribía">escribía</option>
+                <option value="escribían">escribían</option>
+            </select> en mi diario todos los días. (escribir)
+        </li>
+        <li class="exercise-item">
+            Ellos <select data-answer="montaban">
+                <option value=""></option>
+                <option value="montaban">montaban</option>
+                <option value="montábamos">montábamos</option>
+            </select> en bicicleta siempre. (montar en bici)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="escuchábamos">
+                <option value=""></option>
+                <option value="escuchábamos">escuchábamos</option>
+                <option value="escuchaban">escuchaban</option>
+            </select> música juntos a menudo. (escuchar música)
+        </li>
+        <li class="exercise-item">
+            Ella <select data-answer="descansaba">
+                <option value=""></option>
+                <option value="descansaba">descansaba</option>
+                <option value="descansaban">descansaban</option>
+            </select> después de la escuela. (descansar)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="íbamos">
+                <option value=""></option>
+                <option value="íbamos">íbamos</option>
+                <option value="iban">iban</option>
+            </select> al cine a menudo. (ir al cine)
+        </li>
+        <li class="exercise-item">
+            Ustedes <select data-answer="cruzaban">
+                <option value=""></option>
+                <option value="cruzaban">cruzaban</option>
+                <option value="cruzabas">cruzabas</option>
+            </select> la calle. (cruzar)
+        </li>
+        <li class="exercise-item">
+            Él <select data-answer="escuchaba">
+                <option value=""></option>
+                <option value="escuchaba">escuchaba</option>
+                <option value="escuchaban">escuchaban</option>
+            </select> siempre música. (escuchar música)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="leíamos">
+                <option value=""></option>
+                <option value="leíamos">leíamos</option>
+                <option value="leía">leía</option>
+            </select> muchos libros. (leer)
+        </li>
+    </ul>
+</div>
 
-        <!-- Einfache Aufgaben -->
-        <div id="einfach" class="exercise-section">
-            <h2>Einfach</h2>
-            <p>Wähle die richtige Form des Verbs im Imperfecto (2 Antwortmöglichkeiten):</p>
-            <ul class="exercise-list">
-                <li class="exercise-item">1. Yo <select data-answer="hablaba">
-                    <option value="hablaba">hablaba</option>
-                    <option value="hablaban">hablaban</option>
-                </select> mit meinen Freunden jeden Tag. (hablar)</li>
-                <li class="exercise-item">2. Tú <select data-answer="jugabas">
-                    <option value="jugabas">jugabas</option>
-                    <option value="jugaban">jugaban</option>
-                </select> im Park. (jugar)</li>
-                <!-- Weitere Fragen folgen dem gleichen Muster -->
-            </ul>
-        </div>
 
-        <!-- Mittlere Aufgaben -->
-        <div id="mittel" class="exercise-section active">
-            <h2>Mittel</h2>
-            <p>Wähle die richtige Form des Verbs im Imperfecto (4 Antwortmöglichkeiten) und übersetze ins Deutsche:</p>
-            <ul class="exercise-list">
-                <li class="exercise-item">1. Yo <select data-answer="visitaba">
-                    <option value="visitaba">visitaba</option>
-                    <option value="visitabas">visitabas</option>
-                    <option value="visitaban">visitaban</option>
-                    <option value="visitábamos">visitábamos</option>
-                </select> jeden Sommer meine Großeltern. (visitar)</li>
-                <li class="exercise-item">2. Tú <select data-answer="pensabas">
-                    <option value="pensaba">pensaba</option>
-                    <option value="pensabas">pensabas</option>
-                    <option value="pensaban">pensaban</option>
-                    <option value="pensábamos">pensábamos</option>
-                </select> über die Zukunft nach. (pensar)</li>
-                <!-- Weitere Fragen folgen dem gleichen Muster -->
-            </ul>
-        </div>
+<!-- Mittlere Aufgaben -->
+<div id="mittel" class="exercise-section active">
+    <h2>Mittel</h2>
+    <p>Elige la forma correcta del verbo en el Imperfecto (4 opciones de respuesta):</p>
+    <ul class="exercise-list">
+        <li class="exercise-item">
+            Yo <select data-answer="hablaba">
+                <option value=""></option>
+                <option value="hablaba">hablaba</option>
+                <option value="hablabas">hablabas</option>
+                <option value="hablábamos">hablábamos</option>
+                <option value="hablaban">hablaban</option>
+            </select> con mis amigos todos los días. (hablar)
+        </li>
+        <li class="exercise-item">
+            Tú <select data-answer="jugabas">
+                <option value=""></option>
+                <option value="jugaba">jugaba</option>
+                <option value="jugabas">jugabas</option>
+                <option value="jugábamos">jugábamos</option>
+                <option value="jugaban">jugaban</option>
+            </select> en el parque. (jugar)
+        </li>
+        <li class="exercise-item">
+            Él <select data-answer="comía">
+                <option value=""></option>
+                <option value="comía">comía</option>
+                <option value="comías">comías</option>
+                <option value="comíamos">comíamos</option>
+                <option value="comían">comían</option>
+            </select> helado a menudo. (comer)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="vivíamos">
+                <option value=""></option>
+                <option value="vivía">vivía</option>
+                <option value="vivías">vivías</option>
+                <option value="vivíamos">vivíamos</option>
+                <option value="vivían">vivían</option>
+            </select> en una pequeña ciudad. (vivir)
+        </li>
+        <li class="exercise-item">
+            Ellos <select data-answer="trabajaban">
+                <option value=""></option>
+                <option value="trabajaba">trabajaba</option>
+                <option value="trabajabas">trabajabas</option>
+                <option value="trabajábamos">trabajábamos</option>
+                <option value="trabajaban">trabajaban</option>
+            </select> en una fábrica. (trabajar)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="escalábamos">
+                <option value=""></option>
+                <option value="escalaba">escalaba</option>
+                <option value="escalabas">escalabas</option>
+                <option value="escalábamos">escalábamos</option>
+                <option value="escalaban">escalaban</option>
+            </select> las montañas con frecuencia. (escalar)
+        </li>
+        <li class="exercise-item">
+            Tú <select data-answer="hacías">
+                <option value=""></option>
+                <option value="hacía">hacía</option>
+                <option value="hacías">hacías</option>
+                <option value="hacíamos">hacíamos</option>
+                <option value="hacían">hacían</option>
+            </select> siempre las compras. (hacer la compra)
+        </li>
+        <li class="exercise-item">
+            Yo <select data-answer="escribía">
+                <option value=""></option>
+                <option value="escribía">escribía</option>
+                <option value="escribías">escribías</option>
+                <option value="escribíamos">escribíamos</option>
+                <option value="escribían">escribían</option>
+            </select> en mi diario todos los días. (escribir)
+        </li>
+        <li class="exercise-item">
+            Ellos <select data-answer="montaban">
+                <option value=""></option>
+                <option value="montaba">montaba</option>
+                <option value="montabas">montabas</option>
+                <option value="montábamos">montábamos</option>
+                <option value="montaban">montaban</option>
+            </select> en bicicleta siempre. (montar en bici)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="escuchábamos">
+                <option value=""></option>
+                <option value="escuchaba">escuchaba</option>
+                <option value="escuchabas">escuchabas</option>
+                <option value="escuchábamos">escuchábamos</option>
+                <option value="escuchaban">escuchaban</option>
+            </select> música juntos a menudo. (escuchar música)
+        </li>
+        <li class="exercise-item">
+            Ella <select data-answer="descansaba">
+                <option value=""></option>
+                <option value="descansaba">descansaba</option>
+                <option value="descansabas">descansabas</option>
+                <option value="descansábamos">descansábamos</option>
+                <option value="descansaban">descansaban</option>
+            </select> después de la escuela. (descansar)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="íbamos">
+                <option value=""></option>
+                <option value="iba">iba</option>
+                <option value="ibas">ibas</option>
+                <option value="íbamos">íbamos</option>
+                <option value="iban">iban</option>
+            </select> al cine a menudo. (ir al cine)
+        </li>
+        <li class="exercise-item">
+            Ustedes <select data-answer="cruzaban">
+                <option value=""></option>
+                <option value="cruzaba">cruzaba</option>
+                <option value="cruzabas">cruzabas</option>
+                <option value="cruzábamos">cruzábamos</option>
+                <option value="cruzaban">cruzaban</option>
+            </select> la calle. (cruzar)
+        </li>
+        <li class="exercise-item">
+            Él <select data-answer="escuchaba">
+                <option value=""></option>
+                <option value="escuchaba">escuchaba</option>
+                <option value="escuchabas">escuchabas</option>
+                <option value="escuchábamos">escuchábamos</option>
+                <option value="escuchaban">escuchaban</option>
+            </select> siempre música. (escuchar música)
+        </li>
+        <li class="exercise-item">
+            Nosotros <select data-answer="leíamos">
+                <option value=""></option>
+                <option value="leía">leía</option>
+                <option value="leías">leías</option>
+                <option value="leíamos">leíamos</option>
+                <option value="leían">leían</option>
+            </select> muchos libros. (leer)
+        </li>
+    </ul>
+</div>
+
 
         <!-- Schwierige Aufgaben -->
         <div id="schwierig" class="exercise-section">
