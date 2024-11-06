@@ -1,143 +1,69 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Singular und Plural</title>
-    <style>
-        /* Grundlegendes Styling */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #FFFFFF;
-            color: #000000;
-        }
+<body>
 
-        h1 {
-            color: #000000;
-            font-size: 2.2em;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+<div class="container">
+    <h1>Singular und Plural auf Spanisch</h1>
+    
+    <!-- Einfache Erklärung zu "Singular und Plural" für deutsche Schüler -->
+    <div class="explanation">
+        <h2>Was sind Singular und Plural?</h2>
+        <p>Auch im Spanischen gibt es zwei wichtige Formen, um die Anzahl von Dingen oder Personen auszudrücken: <strong>Singular</strong> und <strong>Plural</strong>. Singular bedeutet, dass es nur <strong>eine</strong> Sache oder Person gibt, während Plural bedeutet, dass es <strong>mehrere</strong> gibt.</p>
+        <ul>
+            <li><strong>Singular</strong> bedeutet <em>Einzahl</em>. Zum Beispiel: <strong>la casa</strong> (das Haus, nur eins).</li>
+            <li><strong>Plural</strong> bedeutet <em>Mehrzahl</em>. Zum Beispiel: <strong>las casas</strong> (die Häuser, mehrere).</li>
+        </ul>
 
-        .container {
-            max-width: 600px;
-            margin: auto;
-            text-align: center;
-        }
+        <h3>Wie bildet man den Plural im Spanischen?</h3>
+        <p>Im Spanischen gibt es einfache Regeln, um den Plural zu bilden. Hier sind die wichtigsten Regeln:</p>
+        <ul>
+            <li>Endet ein Wort auf <strong>-a, -e oder -o</strong>, dann hängst du einfach <strong>-s</strong> an. Zum Beispiel: <strong>la casa</strong> &rarr; <strong>las casas</strong> (die Häuser).</li>
+            <li>Endet ein Wort auf einen Konsonanten (z.B. <strong>-d, -l</strong>), dann hängst du <strong>-es</strong> an. Zum Beispiel: <strong>el árbol</strong> &rarr; <strong>los árboles</strong> (die Bäume).</li>
+            <li>Endet ein Wort auf <strong>-z</strong>, wird das <strong>-z</strong> zu <strong>-c</strong> und du hängst <strong>-es</strong> an. Zum Beispiel: <strong>el lápiz</strong> &rarr; <strong>los lápices</strong> (die Bleistifte).</li>
+        </ul>
 
-        /* Kinderfreundliche Box für die Erklärung */
-        .explanation {
-            background-color: #FFFFFF;
-            border: 1px solid #B3D8A5;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 1.1em;
-            line-height: 1.6;
-            color: #000000;
-            margin-bottom: 20px;
-            text-align: left;
-        }
+        <h3>Beispiele für Singular und Plural:</h3>
+        <table>
+            <tr>
+                <th class="form-column">Singular</th>
+                <th class="ending-column">Plural</th>
+            </tr>
+            <tr>
+                <td><strong>la casa</strong></td>
+                <td><strong>las casas</strong></td>
+            </tr>
+            <tr>
+                <td><strong>el gato</strong></td>
+                <td><strong>los gatos</strong></td>
+            </tr>
+            <tr>
+                <td><strong>el árbol</strong></td>
+                <td><strong>los árboles</strong></td>
+            </tr>
+            <tr>
+                <td><strong>el lápiz</strong></td>
+                <td><strong>los lápices</strong></td>
+            </tr>
+        </table>
 
-        .explanation h2 {
-            font-size: 1.6em;
-            color: #000000;
-            margin-bottom: 15px;
-        }
+        <h3>Einfach erklärt:</h3>
+        <p>Singular bedeutet, dass es nur eine Sache oder Person gibt, während Plural bedeutet, dass es mehrere gibt. Zum Beispiel:</p>
 
-        .explanation h3 {
-            font-size: 1.3em;
-            color: #000000;
-            margin-top: 15px;
-            margin-bottom: 10px;
-        }
+        <div class="example">
+            <p><strong>Veo un gato.</strong><br>
+            Auf Deutsch: <em>Ich sehe eine Katze.</em> (Singular - es ist nur eine Katze.)</p>
+        </div>
 
-        .highlight {
-            color: #FF0000;
-            font-weight: bold;
-        }
+        <div class="example">
+            <p><strong>Veo muchos gatos.</strong><br>
+            Auf Deutsch: <em>Ich sehe viele Katzen.</em> (Plural - es sind mehrere Katzen.)</p>
+        </div>
+    </div>
 
-        table {
-            width: 100%;
-            margin: 10px 0;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 1px solid #B3D8A5;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        th {
-            background-color: #DCEFD4;
-            color: #000000;
-        }
-
-        /* Styling für Spaltenbreiten */
-        .form-column {
-            width: 20%;
-        }
-
-        .ending-column {
-            width: 15%;
-            text-align: center;
-        }
-
-        .example-column {
-            width: 35%;
-        }
-
-        .translation-column {
-            width: 30%;
-            text-align: center;
-        }
-
-        .example {
-            background-color: #F1FAF1;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 1.1em;
-            text-align: left;
-            color: #000000;
-            border: 1px solid #B3D8A5;
-        }
-
-        /* Styling für die Buttons */
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        .buttons a {
-            text-decoration: none;
-            padding: 12px 20px;
-            margin-top: 10px;
-            width: 80%;
-            max-width: 200px;
-            border-radius: 8px;
-            color: #000000;
-            background-color: #FFFFFF;
-            font-size: 1em;
-            font-weight: bold;
-            text-align: center;
-            border: 1px solid #B3D8A5;
-            transition: background-color 0.3s;
-        }
-
-        .buttons a:hover {
-            background-color: #E9F7E0;
-        }
-    </style>
-</head>
+    <!-- Buttons zum Navigieren -->
+    <div class="buttons">
+        <a href="uebung.html">Zu den Übungen</a>
+        <a href="../index.html">Zurück zur Startseite</a>
+    </div>
+</div>
 <body>
 
     <div class="container">
