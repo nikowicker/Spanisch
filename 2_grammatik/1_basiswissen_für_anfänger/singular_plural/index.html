@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -107,6 +106,33 @@
         .buttons a:hover {
             background-color: #E9F7E0;
         }
+
+        /* Auffälliger Button unter Video */
+        .quiz-button {
+            display: inline-block;
+            text-decoration: none;
+            padding: 15px 25px;
+            background-color: #008000; /* Grün */
+            color: #FFFFFF;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .quiz-button:hover {
+            background-color: #005f00; /* Dunkleres Grün */
+        }
+
+        /* Responsives Video */
+        iframe {
+            width: 100%;
+            height: auto;
+            max-width: 560px;
+            aspect-ratio: 16 / 9;
+        }
     </style>
 </head>
 </html>
@@ -116,27 +142,31 @@
     <div class="container">
         <h1>Singular und Plural im Spanischen</h1>
         
+        <!-- Lernvideo mit Einführung -->
+        <h2>Lernvideo: Singular und Plural</h2>
+        <p>In diesem Video lernst du, wie der Singular und Plural im Spanischen funktioniert. Schaue dir die Regeln an und merke dir die Beispiele:</p>
+        <iframe src="https://www.youtube.com/embed/B6AnmyFhkgQ?si=_YfNu_bxOc-FYnrx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+        <!-- Quiz-Button unter dem Video -->
+        <a href="quiz.html" class="quiz-button">Teste dein Wissen jetzt!</a>
+
         <!-- Einfache Erklärung zu "Singular und Plural" auf Spanisch -->
         <div class="explanation">
             <h2>Was sind Singular und Plural im Spanischen?</h2>
-            <p>Auch im Spanischen gibt es <strong>Singular</strong> (Einzahl) und <strong>Plural</strong> (Mehrzahl). Singular bedeutet, dass es nur <strong>eine</strong> Sache oder Person gibt, und Plural bedeutet, dass es <strong>mehrere</strong> gibt.</p>
+            <p>Auch im Spanischen gibt es <strong>Singular</strong> (Einzahl) und <strong>Plural</strong> (Mehrzahl):</p>
             <ul>
-                <li><strong>Singular</strong> = <em>Einzahl</em>. Zum Beispiel: <strong>la casa</strong> (das Haus).</li>
-                <li><strong>Plural</strong> = <em>Mehrzahl</em>. Zum Beispiel: <strong>las casas</strong> (die Häuser).</li>
+                <li><strong>Singular</strong> = <em>Einzahl</em>, z. B.: <strong>la casa</strong> (das Haus).</li>
+                <li><strong>Plural</strong> = <em>Mehrzahl</em>, z. B.: <strong>las casas</strong> (die Häuser).</li>
             </ul>
 
             <h3>Wie bildet man den Plural im Spanischen?</h3>
-            <p>Die Regeln für den Plural im Spanischen sind einfacher als im Deutschen. Es gibt klare Muster:</p>
             <ul>
-                <li><strong>Endet ein Wort im Singular auf einen Vokal</strong> (<em>a, e, i, o, u</em>), füge ein <strong>-s</strong> hinzu. <br>
-                    Beispiel: <strong>el perro</strong> (der Hund) &rarr; <strong>los perros</strong> (die Hunde).
-                </li>
-                <li><strong>Endet ein Wort im Singular auf einen Konsonanten</strong>, füge <strong>-es</strong> hinzu. <br>
-                    Beispiel: <strong>la flor</strong> (die Blume) &rarr; <strong>las flores</strong> (die Blumen).
-                </li>
-                <li><strong>Endet ein Wort auf „z“</strong>, wird das „z“ zu einem „c“ und <strong>-es</strong> hinzugefügt. <br>
-                    Beispiel: <strong>el lápiz</strong> (der Bleistift) &rarr; <strong>los lápices</strong> (die Bleistifte).
-                </li>
+                <li><strong>Endet ein Wort im Singular auf einen Vokal</strong>, füge <strong>-s</strong> hinzu: 
+                    <br><strong>el perro</strong> (der Hund) &rarr; <strong>los perros</strong> (die Hunde).</li>
+                <li><strong>Endet ein Wort im Singular auf einen Konsonanten</strong>, füge <strong>-es</strong> hinzu: 
+                    <br><strong>la flor</strong> (die Blume) &rarr; <strong>las flores</strong> (die Blumen).</li>
+                <li><strong>Endet ein Wort auf „z“</strong>, wird „z“ zu „c“ und <strong>-es</strong> hinzugefügt: 
+                    <br><strong>el lápiz</strong> (der Bleistift) &rarr; <strong>los lápices</strong> (die Bleistifte).</li>
             </ul>
 
             <h3>Beispiele für Singular und Plural:</h3>
@@ -163,10 +193,7 @@
                 </tr>
             </table>
 
-            <h3>Lernvideo:</h3>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/B6AnmyFhkgQ?si=_YfNu_bxOc-FYnrx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             <h3>Zusammenfassung:</h3>
-            <p>Um den Plural im Spanischen zu bilden, musst du nur die Endung anpassen:</p>
             <ul>
                 <li><strong>-s</strong> bei Wörtern, die auf einen Vokal enden.</li>
                 <li><strong>-es</strong> bei Wörtern, die auf einen Konsonanten enden.</li>
