@@ -27,37 +27,33 @@
             text-align: center;
         }
 
-        /* Kinderfreundliche Box für die Erklärung */
-        .explanation {
+        /* Box-Styling */
+        .box {
             background-color: #FFFFFF;
             border: 1px solid #B3D8A5;
             padding: 20px;
             border-radius: 10px;
+            margin-bottom: 20px;
             font-size: 1.1em;
             line-height: 1.6;
             color: #000000;
-            margin-bottom: 20px;
             text-align: left;
         }
 
-        .explanation h2 {
+        .box h2 {
             font-size: 1.6em;
             color: #000000;
             margin-bottom: 15px;
         }
 
-        .explanation h3 {
+        .box h3 {
             font-size: 1.3em;
             color: #000000;
             margin-top: 15px;
             margin-bottom: 10px;
         }
 
-        .highlight {
-            color: #FF0000;
-            font-weight: bold;
-        }
-
+        /* Tabelle und Listen */
         table {
             width: 100%;
             margin: 10px 0;
@@ -70,7 +66,7 @@
 
         th, td {
             padding: 8px;
-            text-align: left;
+            text-align: center;
             vertical-align: top;
         }
 
@@ -79,37 +75,17 @@
             color: #000000;
         }
 
-        /* Styling für Spaltenbreiten */
-        .form-column {
-            width: 20%;
-        }
-
-        .ending-column {
-            width: 15%;
-            text-align: center;
-        }
-
-        .example-column {
-            width: 35%;
-        }
-
-        .translation-column {
-            width: 30%;
-            text-align: center;
-        }
-
         .example {
             background-color: #F1FAF1;
             padding: 10px;
             border-radius: 8px;
             margin: 10px 0;
             font-size: 1.1em;
-            text-align: left;
             color: #000000;
             border: 1px solid #B3D8A5;
         }
 
-        /* Styling für die Buttons */
+        /* Buttons */
         .buttons {
             display: flex;
             flex-direction: column;
@@ -136,15 +112,35 @@
         .buttons a:hover {
             background-color: #E9F7E0;
         }
+
+        /* Video */
+        iframe {
+            width: 100%;
+            height: auto;
+            max-width: 560px;
+            aspect-ratio: 16 / 9;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Überschrift -->
         <h1>Die Verben auf -ar</h1>
-        
-        <!-- Einfache Erklärung zu "Die Verben auf -ar" für Kinder -->
-        <div class="explanation">
+
+        <!-- Lernvideo -->
+        <div class="box">
+            <h2>Lernvideo:</h2>
+            <iframe src="https://www.youtube.com/embed/AGet7zkMzJU?si=vOFCVuvnLa-3b6Kk" title="YouTube video player" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <!-- Link zu den Übungen -->
+        <div class="buttons">
+            <a href="uebung.html">Teste dein Wissen jetzt!</a>
+        </div>
+
+        <!-- Erklärungstext -->
+        <div class="box">
             <h2>Was sind Verben auf -ar?</h2>
             <p>Im Spanischen gibt es viele Verben, die auf <strong>-ar</strong> enden. Diese Verben sind sehr häufig. Beispiele für solche Verben sind <strong>hablar</strong>, <strong>cantar</strong> und <strong>estudiar</strong>.</p>
             <ul>
@@ -167,65 +163,59 @@
             <h3>Beispiele für die Konjugation:</h3>
             <table>
                 <tr>
-                    <th class="form-column">Pronomen</th>
-                    <th class="ending-column">Hablar</th>
-                    <th class="ending-column">Cantar</th>
-                    <th class="ending-column">Estudiar</th>
+                    <th>Pronomen</th>
+                    <th>Hablar</th>
+                    <th>Cantar</th>
+                    <th>Estudiar</th>
                 </tr>
                 <tr>
                     <td><strong>yo</strong></td>
-                    <td><strong>hablo</strong></td>
-                    <td><strong>canto</strong></td>
-                    <td><strong>estudio</strong></td>
+                    <td>hablo</td>
+                    <td>canto</td>
+                    <td>estudio</td>
                 </tr>
                 <tr>
                     <td><strong>tú</strong></td>
-                    <td><strong>hablas</strong></td>
-                    <td><strong>cantas</strong></td>
-                    <td><strong>estudias</strong></td>
+                    <td>hablas</td>
+                    <td>cantas</td>
+                    <td>estudias</td>
                 </tr>
                 <tr>
                     <td><strong>él/ella/usted</strong></td>
-                    <td><strong>habla</strong></td>
-                    <td><strong>canta</strong></td>
-                    <td><strong>estudia</strong></td>
+                    <td>habla</td>
+                    <td>canta</td>
+                    <td>estudia</td>
                 </tr>
                 <tr>
                     <td><strong>nosotros/nosotras</strong></td>
-                    <td><strong>hablamos</strong></td>
-                    <td><strong>cantamos</strong></td>
-                    <td><strong>estudiamos</strong></td>
+                    <td>hablamos</td>
+                    <td>cantamos</td>
+                    <td>estudiamos</td>
                 </tr>
                 <tr>
                     <td><strong>vosotros/vosotras</strong></td>
-                    <td><strong>habláis</strong></td>
-                    <td><strong>cantáis</strong></td>
-                    <td><strong>estudiáis</strong></td>
+                    <td>habláis</td>
+                    <td>cantáis</td>
+                    <td>estudiáis</td>
                 </tr>
                 <tr>
                     <td><strong>ellos/ellas/ustedes</strong></td>
-                    <td><strong>hablan</strong></td>
-                    <td><strong>cantan</strong></td>
-                    <td><strong>estudian</strong></td>
+                    <td>hablan</td>
+                    <td>cantan</td>
+                    <td>estudian</td>
                 </tr>
             </table>
-            <h3>Lernvideo:</h3>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/AGet7zkMzJU?si=vOFCVuvnLa-3b6Kk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            <h3>Einfache Erklärung:</h3>
-            <p>Verben auf <strong>-ar</strong> sind leicht zu konjugieren, wenn du die Endungen kennst. Zum Beispiel:</p>
-
             <div class="example">
                 <p><strong>Yo hablo alemán.</strong><br>
-               <em>Das Verb ist <strong>hablar</strong>, und die Form für "ich" ist <strong>hablo</strong>.</em></p>
+                <em>Das Verb ist <strong>hablar</strong>, und die Form für "ich" ist <strong>hablo</strong>.</em></p>
             </div>
-
             <div class="example">
                 <p><strong>Nosotros cantamos una canción.</strong><br>
-               <em>Das Verb ist <strong>cantar</strong>, und die Form für "wir" ist <strong>cantamos</strong>.</em></p>
+                <em>Das Verb ist <strong>cantar</strong>, und die Form für "wir" ist <strong>cantamos</strong>.</em></p>
             </div>
         </div>
 
-        <!-- Buttons zum Navigieren -->
+        <!-- Navigationsbuttons -->
         <div class="buttons">
             <a href="uebung.html">Übungen</a>
             <a href="../index.html">zurück</a>
