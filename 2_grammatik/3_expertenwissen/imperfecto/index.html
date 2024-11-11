@@ -27,8 +27,8 @@
             text-align: center;
         }
 
-        /* Kinderfreundliche Box für die Erklärung */
-        .explanation {
+        /* Einheitliches Styling für Boxen */
+        .box {
             background-color: #FFFFFF;
             border: 1px solid #B3D8A5;
             padding: 20px;
@@ -40,15 +40,17 @@
             text-align: left;
         }
 
-        .explanation h2 {
-            font-size: 1.6em;
+        .box h2, .box h3 {
             color: #000000;
+        }
+
+        .box h2 {
+            font-size: 1.6em;
             margin-bottom: 15px;
         }
 
-        .explanation h3 {
+        .box h3 {
             font-size: 1.3em;
-            color: #000000;
             margin-top: 15px;
             margin-bottom: 10px;
         }
@@ -74,37 +76,7 @@
             color: #000000;
         }
 
-        /* Styling für Spaltenbreiten */
-        .form-column {
-            width: 20%;
-        }
-
-        .ending-column {
-            width: 15%;
-            text-align: center;
-        }
-
-        .example-column {
-            width: 35%;
-        }
-
-        .translation-column {
-            width: 30%;
-            text-align: center;
-        }
-
-        .example {
-            background-color: #F1FAF1;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 1.1em;
-            text-align: left;
-            color: #000000;
-            border: 1px solid #B3D8A5;
-        }
-
-        /* Styling für die Buttons */
+        /* Buttons */
         .buttons {
             display: flex;
             flex-direction: column;
@@ -131,15 +103,52 @@
         .buttons a:hover {
             background-color: #E9F7E0;
         }
+
+        iframe {
+            width: 100%;
+            height: auto;
+            max-width: 560px;
+            aspect-ratio: 16 / 9;
+            border-radius: 10px;
+            border: 1px solid #B3D8A5;
+        }
+
+        .example {
+            background-color: #F1FAF1;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1.1em;
+            text-align: left;
+            color: #000000;
+            border: 1px solid #B3D8A5;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Überschrift -->
         <h1>El Pretérito Imperfecto</h1>
-        
-        <!-- Einfache Erklärung zu „El Pretérito Imperfecto“ für Kinder -->
-        <div class="explanation">
+
+        <!-- Lernvideos -->
+        <div class="box">
+            <h3>Lernvideo: Wie bilde ich el imperfecto?</h3>
+            <iframe src="https://www.youtube.com/embed/1az_8GC5fiE?si=X1qjPm3OqnkrejZd" title="YouTube video player" allowfullscreen></iframe>
+        </div>
+
+        <!-- Übungs-Button -->
+        <div class="buttons">
+            <a href="uebung.html">Zu den Übungen</a>
+        </div>
+
+        <!-- Zurück-Button -->
+        <div class="buttons">
+            <a href="../index.html">Zurück zur Startseite</a>
+        </div>
+
+        <!-- Erklärung -->
+        <div class="box">
             <h2>Wie bildet man das Imperfecto?</h2>
             <p>Imperfecto benutzt man, wenn man über Dinge spricht, die man <strong>früher oft gemacht</strong> hat oder die <strong>lange dauerten</strong>. Es ist wie eine Erinnerung an etwas, das man oft getan hat.</p>
 
@@ -147,10 +156,10 @@
             <p>Wenn ein Wort auf „-ar“ endet, wie <em>hablar</em> (sprechen), dann hängen wir diese Endungen dran:</p>
             <table>
                 <tr>
-                    <th class="form-column">Form</th>
-                    <th class="ending-column">Endung</th>
-                    <th class="example-column">Beispiel</th>
-                    <th class="translation-column">Deutsche<br>Übersetzung</th>
+                    <th>Form</th>
+                    <th>Endung</th>
+                    <th>Beispiel</th>
+                    <th>Deutsche Übersetzung</th>
                 </tr>
                 <tr>
                     <td>yo</td>
@@ -194,10 +203,10 @@
             <p>Wenn ein Wort auf „-er“ oder „-ir“ endet, wie <em>comer</em> (essen) oder <em>vivir</em> (leben), dann hängen wir diese Endungen dran:</p>
             <table>
                 <tr>
-                    <th class="form-column">Form</th>
-                    <th class="ending-column">Endung</th>
-                    <th class="example-column">Beispiel</th>
-                    <th class="translation-column">Deutsche<br>Übersetzung</th>
+                    <th>Form</th>
+                    <th>Endung</th>
+                    <th>Beispiel</th>
+                    <th>Deutsche Übersetzung</th>
                 </tr>
                 <tr>
                     <td>yo</td>
@@ -241,10 +250,10 @@
             <p>Einige Verben sind unregelmäßig im Imperfecto. Zum Beispiel das Verb <em>ir</em> (gehen):</p>
             <table>
                 <tr>
-                    <th class="form-column">Form</th>
-                    <th class="ending-column">Endung</th>
-                    <th class="example-column">Beispiel</th>
-                    <th class="translation-column">Deutsche<br>Übersetzung</th>
+                    <th>Form</th>
+                    <th>Endung</th>
+                    <th>Beispiel</th>
+                    <th>Deutsche Übersetzung</th>
                 </tr>
                 <tr>
                     <td>yo</td>
@@ -283,10 +292,7 @@
                     <td>sie gingen</td>
                 </tr>
             </table>
-            <h3>Lernvideo: Wie bilde ich el imperfecto?</h3>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/1az_8GC5fiE?si=X1qjPm3OqnkrejZd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            <h3>Lernvideo: Wie verwende ich el imperfecto?</h3>
-        
+
             <h3>Beispiele:</h3>
             <div class="example">
                 <p><strong>Ich spielte jeden Tag draußen.</strong><br>
@@ -304,7 +310,7 @@
             </div>
         </div>
 
-        <!-- Buttons zum Navigieren -->
+        <!-- Navigations-Buttons -->
         <div class="buttons">
             <a href="uebung.html">Zu den Übungen</a>
             <a href="../index.html">Zurück zur Startseite</a>
