@@ -27,26 +27,26 @@
             text-align: center;
         }
 
-        /* Kinderfreundliche Box für die Erklärung */
-        .explanation {
+        /* Box-Styling */
+        .box {
             background-color: #FFFFFF;
             border: 1px solid #B3D8A5;
             padding: 20px;
             border-radius: 10px;
+            margin-bottom: 20px;
             font-size: 1.1em;
             line-height: 1.6;
             color: #000000;
-            margin-bottom: 20px;
             text-align: left;
         }
 
-        .explanation h2 {
+        .box h2 {
             font-size: 1.6em;
             color: #000000;
             margin-bottom: 15px;
         }
 
-        .explanation h3 {
+        .box h3 {
             font-size: 1.3em;
             color: #000000;
             margin-top: 15px;
@@ -58,6 +58,7 @@
             font-weight: bold;
         }
 
+        /* Tabelle und Listen */
         table {
             width: 100%;
             margin: 10px 0;
@@ -70,7 +71,7 @@
 
         th, td {
             padding: 8px;
-            text-align: left;
+            text-align: center;
             vertical-align: top;
         }
 
@@ -79,37 +80,11 @@
             color: #000000;
         }
 
-        /* Styling für Spaltenbreiten */
-        .form-column {
-            width: 20%;
+        ul {
+            margin-top: 10px;
         }
 
-        .ending-column {
-            width: 15%;
-            text-align: center;
-        }
-
-        .example-column {
-            width: 35%;
-        }
-
-        .translation-column {
-            width: 30%;
-            text-align: center;
-        }
-
-        .example {
-            background-color: #F1FAF1;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 1.1em;
-            text-align: left;
-            color: #000000;
-            border: 1px solid #B3D8A5;
-        }
-
-        /* Styling für die Buttons */
+        /* Buttons */
         .buttons {
             display: flex;
             flex-direction: column;
@@ -136,15 +111,34 @@
         .buttons a:hover {
             background-color: #E9F7E0;
         }
+
+        iframe {
+            width: 100%;
+            height: auto;
+            max-width: 560px;
+            aspect-ratio: 16 / 9;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Überschrift -->
         <h1>Die Reflexiven Verben</h1>
-        
-        <!-- Einfache Erklärung zu "Die Reflexiven Verben" für Kinder -->
-        <div class="explanation">
+
+        <!-- Lernvideo -->
+        <div class="box">
+            <h2>Lernvideo:</h2>
+            <iframe src="https://www.youtube.com/embed/exampleVideoURL" title="YouTube video player" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <!-- Link zum Test -->
+        <div class="buttons">
+            <a href="uebung.html">Teste dein Wissen jetzt!</a>
+        </div>
+
+        <!-- Erklärungstext -->
+        <div class="box">
             <h2>Was sind Reflexive Verben?</h2>
             <p>Im Spanischen gibt es Verben, die <strong>reflexiv</strong> sind. Das bedeutet, dass die Handlung sich auf die Person selbst bezieht. Diese Verben haben <strong>se</strong> am Ende. Beispiele sind <strong>levantarse</strong> (aufstehen), <strong>lavarse</strong> (sich waschen) und <strong>llamarse</strong> (heißen).</p>
             
@@ -162,10 +156,10 @@
             <h3>Beispiele:</h3>
             <table>
                 <tr>
-                    <th class="form-column">Pronomen</th>
-                    <th class="ending-column">Levantarse</th>
-                    <th class="ending-column">Lavarse</th>
-                    <th class="ending-column">Llamarse</th>
+                    <th>Pronomen</th>
+                    <th>Levantarse</th>
+                    <th>Lavarse</th>
+                    <th>Llamarse</th>
                 </tr>
                 <tr>
                     <td><strong>yo</strong></td>
@@ -210,20 +204,21 @@
 
             <div class="example">
                 <p><strong>Ich stehe morgens auf.</strong><br>
-                Auf Spanisch: <em>Das Verb ist <strong>levantarse</strong>, und die Form für "ich" ist <strong>me levanto</strong>.</em></p>
+                Auf Spanisch: <em><strong>Me levanto</strong>.</em></p>
             </div>
 
             <div class="example">
                 <p><strong>Wir waschen uns die Hände.</strong><br>
-                Auf Spanisch: <em>Das Verb ist <strong>lavarse</strong>, und die Form für "wir" ist <strong>nos lavamos</strong>.</em></p>
+                Auf Spanisch: <em><strong>Nos lavamos</strong> las manos.</em></p>
             </div>
         </div>
 
-        <!-- Buttons zum Navigieren -->
+        <!-- Navigationsbuttons -->
         <div class="buttons">
             <a href="uebung.html">Zu den Übungen</a>
             <a href="../index.html">Zurück zur Startseite</a>
-              </div>
+        </div>
     </div>
+
 </body>
 </html>
