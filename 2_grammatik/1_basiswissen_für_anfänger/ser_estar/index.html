@@ -27,37 +27,33 @@
             text-align: center;
         }
 
-        /* Kinderfreundliche Box für die Erklärung */
-        .explanation {
+        /* Box-Styling */
+        .box {
             background-color: #FFFFFF;
             border: 1px solid #B3D8A5;
             padding: 20px;
             border-radius: 10px;
+            margin-bottom: 20px;
             font-size: 1.1em;
             line-height: 1.6;
             color: #000000;
-            margin-bottom: 20px;
             text-align: left;
         }
 
-        .explanation h2 {
+        .box h2 {
             font-size: 1.6em;
             color: #000000;
             margin-bottom: 15px;
         }
 
-        .explanation h3 {
+        .box h3 {
             font-size: 1.3em;
             color: #000000;
             margin-top: 15px;
             margin-bottom: 10px;
         }
 
-        .highlight {
-            color: #FF0000;
-            font-weight: bold;
-        }
-
+        /* Tabelle und Listen */
         table {
             width: 100%;
             margin: 10px 0;
@@ -79,7 +75,11 @@
             color: #000000;
         }
 
-        /* Styling für die Buttons */
+        ul {
+            margin-top: 10px;
+        }
+
+        /* Buttons */
         .buttons {
             display: flex;
             flex-direction: column;
@@ -111,10 +111,22 @@
 <body>
 
     <div class="container">
+        <!-- Überschrift -->
         <h1>Ser und Estar</h1>
-        
-        <!-- Einfache Erklärung zu "Ser und Estar" für Kinder -->
-        <div class="explanation">
+
+        <!-- Lernvideo -->
+        <div class="box">
+            <h2>Lernvideo:</h2>
+            <iframe width="100%" height="315" src="https://www.youtube.com/embed/exampleVideoURL" title="YouTube video player" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <!-- Link zum Test -->
+        <div class="buttons">
+            <a href="uebung.html">Teste dein Wissen jetzt!</a>
+        </div>
+
+        <!-- Erklärungstext -->
+        <div class="box">
             <h2>Was bedeuten "ser" und "estar"?</h2>
             <p>Im Spanischen gibt es zwei Verben, die beide "sein" bedeuten: <strong>ser</strong> und <strong>estar</strong>. Obwohl sie ähnliche Bedeutungen haben, werden sie in unterschiedlichen Situationen verwendet.</p>
             <ul>
@@ -123,7 +135,6 @@
             </ul>
 
             <h3>Konjugation von "ser" und "estar"</h3>
-            <p>Hier sind die Konjugationen von <strong>ser</strong> und <strong>estar</strong> im Präsens, um zu zeigen, wie sich diese Verben unterscheiden:</p>
             <table>
                 <tr>
                     <th>Person</th>
@@ -177,48 +188,11 @@
                 <li>Ortsangaben: <strong>Estamos en casa</strong> (Wir sind zu Hause).</li>
                 <li>Vorübergehende Zustände: <strong>Está nublado</strong> (Es ist bewölkt).</li>
             </ul>
-
-            <h3>Beispiele für "ser" und "estar":</h3>
-            <table>
-                <tr>
-                    <th class="form-column">Ser</th>
-                    <th class="ending-column">Estar</th>
-                </tr>
-                <tr>
-                    <td><strong>Yo soy alto</strong> (Ich bin groß - dauerhafte Eigenschaft)</td>
-                    <td><strong>Yo estoy cansado</strong> (Ich bin müde - vorübergehender Zustand)</td>
-                </tr>
-                <tr>
-                    <td><strong>Es estudiante</strong> (Er/Sie ist Schüler/Student)</td>
-                    <td><strong>Está en la escuela</strong> (Er/Sie ist in der Schule)</td>
-                </tr>
-                <tr>
-                    <td><strong>Somos amigos</strong> (Wir sind Freunde)</td>
-                    <td><strong>Estamos felices</strong> (Wir sind glücklich)</td>
-                </tr>
-                <tr>
-                    <td><strong>Es un coche rojo</strong> (Es ist ein rotes Auto)</td>
-                    <td><strong>El coche está sucio</strong> (Das Auto ist schmutzig)</td>
-                </tr>
-            </table>
-
-            <h3>Einfach erklärt:</h3>
-            <p><strong>Ser</strong> beschreibt, was jemand oder etwas dauerhaft ist, während <strong>estar</strong> beschreibt, wie oder wo jemand oder etwas gerade ist.</p>
-
-            <div class="example">
-                <p><strong>Yo soy estudiante.</strong><br>
-                Auf Deutsch: <em>Dauerhafte Eigenschaft - ich bin ein Schüler/Student.</em></p>
-            </div>
-
-            <div class="example">
-                <p><strong>Estoy en casa.</strong><br>
-                Auf Deutsch: <em>Vorübergehender Zustand - ich bin zu Hause.</em></p>
-            </div>
         </div>
 
-        <!-- Buttons zum Navigieren -->
+        <!-- Navigationsbuttons -->
         <div class="buttons">
-            <a href="uebung.html">Zu den Übungen</a>
+            <a href="uebung.html">Übungen</a>
             <a href="../index.html">Zurück zur Startseite</a>
         </div>
     </div>
