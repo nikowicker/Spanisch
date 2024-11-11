@@ -27,32 +27,33 @@
             text-align: center;
         }
 
-        /* Kinderfreundliche Box für die Erklärung */
-        .explanation {
+        /* Box-Styling */
+        .box {
             background-color: #FFFFFF;
             border: 1px solid #B3D8A5;
             padding: 20px;
             border-radius: 10px;
+            margin-bottom: 20px;
             font-size: 1.1em;
             line-height: 1.6;
             color: #000000;
-            margin-bottom: 20px;
             text-align: left;
         }
 
-        .explanation h2 {
+        .box h2 {
             font-size: 1.6em;
             color: #000000;
             margin-bottom: 15px;
         }
 
-        .explanation h3 {
+        .box h3 {
             font-size: 1.3em;
             color: #000000;
             margin-top: 15px;
             margin-bottom: 10px;
         }
 
+        /* Tabelle und Listen */
         table {
             width: 100%;
             margin: 10px 0;
@@ -65,7 +66,7 @@
 
         th, td {
             padding: 8px;
-            text-align: left;
+            text-align: center;
             vertical-align: top;
         }
 
@@ -74,37 +75,11 @@
             color: #000000;
         }
 
-        /* Styling für Spaltenbreiten */
-        .form-column {
-            width: 20%;
+        ul {
+            margin-top: 10px;
         }
 
-        .ending-column {
-            width: 15%;
-            text-align: center;
-        }
-
-        .example-column {
-            width: 35%;
-        }
-
-        .translation-column {
-            width: 30%;
-            text-align: center;
-        }
-
-        .example {
-            background-color: #F1FAF1;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 1.1em;
-            text-align: left;
-            color: #000000;
-            border: 1px solid #B3D8A5;
-        }
-
-        /* Styling für die Buttons */
+        /* Buttons */
         .buttons {
             display: flex;
             flex-direction: column;
@@ -131,15 +106,34 @@
         .buttons a:hover {
             background-color: #E9F7E0;
         }
+
+        iframe {
+            width: 100%;
+            height: auto;
+            max-width: 560px;
+            aspect-ratio: 16 / 9;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Überschrift -->
         <h1>Gustar</h1>
-        
-        <!-- Einfache Erklärung zu "Gustar" für Kinder -->
-        <div class="explanation">
+
+        <!-- Lernvideo -->
+        <div class="box">
+            <h2>Lernvideo:</h2>
+            <iframe src="https://www.youtube.com/embed/exampleVideoURL" title="YouTube video player" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <!-- Link zum Test -->
+        <div class="buttons">
+            <a href="uebung.html">Teste dein Wissen jetzt!</a>
+        </div>
+
+        <!-- Erklärungstext -->
+        <div class="box">
             <h2>Wie verwendet man das Verb "gustar"?</h2>
             <p>Das Verb <em>gustar</em> benutzt man, um zu sagen, dass einem etwas <strong>gefällt</strong>. Es funktioniert etwas anders als im Deutschen. Anstatt zu sagen "Ich mag etwas", sagt man auf Spanisch "Etwas gefällt mir".</p>
 
@@ -147,10 +141,10 @@
             <p>Hier sind die häufigsten Formen von <em>gustar</em>:</p>
             <table>
                 <tr>
-                    <th class="form-column">Person</th>
-                    <th class="ending-column">Form von "gustar"</th>
-                    <th class="example-column">Beispiel</th>
-                    <th class="translation-column">Deutsche<br>Übersetzung</th>
+                    <th>Person</th>
+                    <th>Form von "gustar"</th>
+                    <th>Beispiel</th>
+                    <th>Deutsche Übersetzung</th>
                 </tr>
                 <tr>
                     <td>me</td>
@@ -194,10 +188,10 @@
             <p>Wenn das, was einem gefällt, im Plural ist, verwendet man <strong>gustan</strong> anstatt <strong>gusta</strong>. Zum Beispiel:</p>
             <table>
                 <tr>
-                    <th class="form-column">Person</th>
-                    <th class="ending-column">Form von "gustar"</th>
-                    <th class="example-column">Beispiel</th>
-                    <th class="translation-column">Deutsche<br>Übersetzung</th>
+                    <th>Person</th>
+                    <th>Form von "gustar"</th>
+                    <th>Beispiel</th>
+                    <th>Deutsche Übersetzung</th>
                 </tr>
                 <tr>
                     <td>me</td>
@@ -230,7 +224,7 @@
             </div>
         </div>
 
-        <!-- Buttons zum Navigieren -->
+        <!-- Navigationsbuttons -->
         <div class="buttons">
             <a href="uebung.html">Zu den Übungen</a>
             <a href="../index.html">Zurück zur Startseite</a>
