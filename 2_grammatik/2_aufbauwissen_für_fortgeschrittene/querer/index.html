@@ -27,26 +27,26 @@
             text-align: center;
         }
 
-        /* Kinderfreundliche Box für die Erklärung */
-        .explanation {
+        /* Box-Styling */
+        .box {
             background-color: #FFFFFF;
             border: 1px solid #B3D8A5;
             padding: 20px;
             border-radius: 10px;
+            margin-bottom: 20px;
             font-size: 1.1em;
             line-height: 1.6;
             color: #000000;
-            margin-bottom: 20px;
             text-align: left;
         }
 
-        .explanation h2 {
+        .box h2 {
             font-size: 1.6em;
             color: #000000;
             margin-bottom: 15px;
         }
 
-        .explanation h3 {
+        .box h3 {
             font-size: 1.3em;
             color: #000000;
             margin-top: 15px;
@@ -58,6 +58,7 @@
             font-weight: bold;
         }
 
+        /* Tabelle und Listen */
         table {
             width: 100%;
             margin: 10px 0;
@@ -70,7 +71,7 @@
 
         th, td {
             padding: 8px;
-            text-align: left;
+            text-align: center;
             vertical-align: top;
         }
 
@@ -79,37 +80,11 @@
             color: #000000;
         }
 
-        /* Styling für Spaltenbreiten */
-        .form-column {
-            width: 20%;
+        ul {
+            margin-top: 10px;
         }
 
-        .ending-column {
-            width: 15%;
-            text-align: center;
-        }
-
-        .example-column {
-            width: 35%;
-        }
-
-        .translation-column {
-            width: 30%;
-            text-align: center;
-        }
-
-        .example {
-            background-color: #F1FAF1;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 1.1em;
-            text-align: left;
-            color: #000000;
-            border: 1px solid #B3D8A5;
-        }
-
-        /* Styling für die Buttons */
+        /* Buttons */
         .buttons {
             display: flex;
             flex-direction: column;
@@ -136,15 +111,34 @@
         .buttons a:hover {
             background-color: #E9F7E0;
         }
+
+        iframe {
+            width: 100%;
+            height: auto;
+            max-width: 560px;
+            aspect-ratio: 16 / 9;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Überschrift -->
         <h1>Querer, Poder, Tener que</h1>
-        
-        <!-- Einfache Erklärung zu "Querer, Poder, Tener que" für Kinder -->
-        <div class="explanation">
+
+        <!-- Lernvideo -->
+        <div class="box">
+            <h2>Lernvideo:</h2>
+            <iframe src="https://www.youtube.com/embed/exampleVideoURL" title="YouTube video player" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <!-- Link zum Test -->
+        <div class="buttons">
+            <a href="uebung.html">Teste dein Wissen jetzt!</a>
+        </div>
+
+        <!-- Erklärungstext -->
+        <div class="box">
             <h2>Was bedeuten Querer, Poder und Tener que?</h2>
             <p>Die Verben <strong>querer</strong>, <strong>poder</strong> und <strong>tener que</strong> sind sehr wichtige Verben im Spanischen, weil sie uns helfen, Wünsche, Möglichkeiten und Notwendigkeiten auszudrücken.</p>
             <ul>
@@ -154,13 +148,13 @@
             </ul>
 
             <h3>Konjugation der Verben im Präsens:</h3>
-            <p>Bei den Verben <strong>querer</strong> und <strong>poder</strong> gibt es im Präsens einen <strong>Vokalwechsel</strong>. Das bedeutet, dass sich der Vokal im Stamm des Verbs verändert, wenn man sie konjugiert. Dies geschieht in allen Formen, außer in der 1. und 2. Person Plural (nosotros und vosotros). Das Verb <strong>tener que</strong> ist ebenfalls unregelmäßig, hat aber keinen Vokalwechsel im Präsens.</p>
+            <p>Bei den Verben <strong>querer</strong> und <strong>poder</strong> gibt es im Präsens einen <strong>Vokalwechsel</strong>. Dies geschieht in allen Formen, außer in der 1. und 2. Person Plural (nosotros und vosotros). Das Verb <strong>tener que</strong> ist ebenfalls unregelmäßig, hat aber keinen Vokalwechsel im Präsens.</p>
 
             <h4>Querer (wollen) - Vokalwechsel: e &rarr; ie</h4>
             <table>
                 <tr>
-                    <th class="form-column">Form</th>
-                    <th class="ending-column">querer</th>
+                    <th>Form</th>
+                    <th>querer</th>
                 </tr>
                 <tr>
                     <td>yo</td>
@@ -175,11 +169,11 @@
                     <td><span class="highlight">quiere</span></td>
                 </tr>
                 <tr>
-                    <td>nosotros/nosotras</td>
+                    <td>nosotros</td>
                     <td><strong>queremos</strong></td>
                 </tr>
                 <tr>
-                    <td>vosotros/vosotras</td>
+                    <td>vosotros</td>
                     <td><strong>queréis</strong></td>
                 </tr>
                 <tr>
@@ -191,8 +185,8 @@
             <h4>Poder (können) - Vokalwechsel: o &rarr; ue</h4>
             <table>
                 <tr>
-                    <th class="form-column">Form</th>
-                    <th class="ending-column">poder</th>
+                    <th>Form</th>
+                    <th>poder</th>
                 </tr>
                 <tr>
                     <td>yo</td>
@@ -207,11 +201,11 @@
                     <td><span class="highlight">puede</span></td>
                 </tr>
                 <tr>
-                    <td>nosotros/nosotras</td>
+                    <td>nosotros</td>
                     <td><strong>podemos</strong></td>
                 </tr>
                 <tr>
-                    <td>vosotros/vosotras</td>
+                    <td>vosotros</td>
                     <td><strong>podéis</strong></td>
                 </tr>
                 <tr>
@@ -223,8 +217,8 @@
             <h4>Tener que (müssen)</h4>
             <table>
                 <tr>
-                    <th class="form-column">Form</th>
-                    <th class="ending-column">tener que</th>
+                    <th>Form</th>
+                    <th>tener que</th>
                 </tr>
                 <tr>
                     <td>yo</td>
@@ -239,11 +233,11 @@
                     <td><strong>tiene que</strong></td>
                 </tr>
                 <tr>
-                    <td>nosotros/nosotras</td>
+                    <td>nosotros</td>
                     <td><strong>tenemos que</strong></td>
                 </tr>
                 <tr>
-                    <td>vosotros/vosotras</td>
+                    <td>vosotros</td>
                     <td><strong>tenéis que</strong></td>
                 </tr>
                 <tr>
@@ -269,7 +263,7 @@
             </div>
         </div>
 
-        <!-- Buttons zum Navigieren -->
+        <!-- Navigationsbuttons -->
         <div class="buttons">
             <a href="uebung.html">Zu den Übungen</a>
             <a href="../index.html">Zurück zur Startseite</a>
