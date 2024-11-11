@@ -27,8 +27,8 @@
             text-align: center;
         }
 
-        /* Kinderfreundliche Box für die Erklärung */
-        .explanation {
+        /* Einheitliches Styling für Boxen */
+        .box {
             background-color: #FFFFFF;
             border: 1px solid #B3D8A5;
             padding: 20px;
@@ -40,15 +40,17 @@
             text-align: left;
         }
 
-        .explanation h2 {
-            font-size: 1.6em;
+        .box h2, .box h3 {
             color: #000000;
+        }
+
+        .box h2 {
+            font-size: 1.6em;
             margin-bottom: 15px;
         }
 
-        .explanation h3 {
+        .box h3 {
             font-size: 1.3em;
-            color: #000000;
             margin-top: 15px;
             margin-bottom: 10px;
         }
@@ -74,37 +76,7 @@
             color: #000000;
         }
 
-        /* Styling für Spaltenbreiten */
-        .form-column {
-            width: 20%;
-        }
-
-        .ending-column {
-            width: 15%;
-            text-align: center;
-        }
-
-        .example-column {
-            width: 35%;
-        }
-
-        .translation-column {
-            width: 30%;
-            text-align: center;
-        }
-
-        .example {
-            background-color: #F1FAF1;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-size: 1.1em;
-            text-align: left;
-            color: #000000;
-            border: 1px solid #B3D8A5;
-        }
-
-        /* Styling für die Buttons */
+        /* Buttons */
         .buttons {
             display: flex;
             flex-direction: column;
@@ -131,15 +103,57 @@
         .buttons a:hover {
             background-color: #E9F7E0;
         }
+
+        iframe {
+            width: 100%;
+            height: auto;
+            max-width: 560px;
+            aspect-ratio: 16 / 9;
+            border-radius: 10px;
+            border: 1px solid #B3D8A5;
+        }
+
+        .example {
+            background-color: #F1FAF1;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 1.1em;
+            text-align: left;
+            color: #000000;
+            border: 1px solid #B3D8A5;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Überschrift -->
         <h1>El Indefinido - Unregelmäßige Verben</h1>
-        
+
+        <!-- Lernvideos -->
+        <div class="box">
+            <h3>Lernvideo: Wie bilde ich el indefinido?</h3>
+            <iframe src="https://www.youtube.com/embed/a61M-TDEdh0?si=aUrGi4j93w_xtANW" title="YouTube video player" allowfullscreen></iframe>
+        </div>
+
+        <div class="box">
+            <h3>Lernvideo: Wie verwende ich el indefinido?</h3>
+            <iframe src="https://www.youtube.com/embed/a61M-TDEdh0?si=aUrGi4j93w_xtANW" title="YouTube video player" allowfullscreen></iframe>
+        </div>
+
+        <!-- Übungs-Button -->
+        <div class="buttons">
+            <a href="uebung.html">Zu den Übungen</a>
+        </div>
+
+        <!-- Zurück-Button -->
+        <div class="buttons">
+            <a href="../index.html">Zurück zur Startseite</a>
+        </div>
+
         <!-- Einfache Erklärung zu "El Indefinido" für Kinder -->
-        <div class="explanation">
+        <div class="box">
             <h2>Was ist das Indefinido?</h2>
             <p>Das <strong>Indefinido</strong> ist eine spanische Vergangenheitsform, die verwendet wird, um <strong>abgeschlossene Handlungen</strong> in der Vergangenheit zu beschreiben. Es geht darum, was zu einem bestimmten Zeitpunkt passiert ist und jetzt abgeschlossen ist.</p>
 
@@ -202,6 +216,7 @@
                 <li>ellos/ellas/ustedes: -ieron</li>
             </ul>
             <p>Anders als bei regulären Verben gibt es hier <strong>keine Akzente</strong> auf den Endungen.</p>
+            
             <h3>Beispiele für andere unregelmäßige Verben:</h3>
             <ul>
                 <li><strong>traducir</strong> (übersetzen) - 1. Person Singular: <em>yo traduje</em></li>
@@ -210,9 +225,6 @@
             </ul>
             <p>Wie du siehst, ändern sich die Wortstämme der Verben (z.B. <em>traducir</em> zu <em>traduj-</em>), und dann hängt man die Endungen wie <em>-e</em>, <em>-iste</em>, <em>-o</em>, usw. an.</p>
          
-            <h3>Lernvideo: Wie bilde ich el indefinido?</h3>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/a61M-TDEdh0?si=aUrGi4j93w_xtANW" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            <h3>Lernvideo: Wie verwende ich el indefinido?</h3>
             <h3>Einfach erklärt:</h3>
             <p>Diese Verben haben im Indefinido spezielle Formen, die sich von den normalen Endungen unterscheiden. Schauen wir uns ein paar Beispiele an, um den Unterschied besser zu verstehen:</p>
 
@@ -223,7 +235,7 @@
 
             <div class="example">
                 <p><strong>Letzte Woche hatte ich viel zu tun.</strong><br>
-                Auf Spanisch: <em>La semana pasada tuve mucho que machen.</em> (Verb: tener, 1. Person Singular: tuve)</p>
+                Auf Spanisch: <em>La semana pasada tuve mucho que hacer.</em> (Verb: tener, 1. Person Singular: tuve)</p>
             </div>
 
             <div class="example">
@@ -232,7 +244,7 @@
             </div>
         </div>
 
-        <!-- Buttons zum Navigieren -->
+        <!-- Navigations-Buttons -->
         <div class="buttons">
             <a href="uebung.html">Zu den Übungen</a>
             <a href="../index.html">Zurück zur Startseite</a>
